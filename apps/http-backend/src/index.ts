@@ -1,12 +1,26 @@
 import express from "express";
 import jwt from "jsonwebtoken";
-import { JWT_SECRET } from "./config";
 import { middleware } from "./middleware";
+import { JWT_SECRET } from "@repo/backend-common/config";
+import { CreateUserSchema } from "@repo/common/types";
+
 
 const app = express();
 
 
 app.post("/signup", (req, res) => {
+
+    const data = CreateUserSchema.safeParse(req.body);
+    if(!data.success) {
+        res.status(400).json({
+            error: "Invalid data"
+        });
+        return;
+    }
+
+    res.json({
+        userId: "123",
+    })
 
 });
 
