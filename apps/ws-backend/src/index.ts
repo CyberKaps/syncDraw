@@ -2,7 +2,7 @@
 
 import { WebSocketServer } from 'ws';
 import jwt, { JwtPayload } from 'jsonwebtoken';
-// import { JWT_SECRET } from "@repo/backend-common/config";
+import { JWT_SECRET } from "@repo/backend-common/config";
 
 
 
@@ -17,7 +17,7 @@ wss.on('connection', function connection(ws, request) {
     }
     const queryParams = new URLSearchParams(url.split('?')[1]);
     const token = queryParams.get('token');
-    const decoded  = jwt.verify(token as string, "JWT_SECRET");
+    const decoded  = jwt.verify(token as string, JWT_SECRET);
 
     if(!decoded || !(decoded as JwtPayload).userId) {
         ws.close();
