@@ -7,6 +7,7 @@ import { prismaClient } from "@repo/db/client";
 
 
 const app = express();
+app.use(express.json());
 
 
 app.post("/signup",async (req, res) => {
@@ -20,7 +21,7 @@ app.post("/signup",async (req, res) => {
     }
 
     try {
-        await prismaClient.user.create({
+        const user = await prismaClient.user.create({
             data: {
                 email: parsedData.data.username,
                 password: parsedData.data.password,
@@ -29,7 +30,7 @@ app.post("/signup",async (req, res) => {
         })
 
         res.json({
-            userId: "123",
+            userId: user.id,
         })
     } catch (error) {
         res.status(411).json({
