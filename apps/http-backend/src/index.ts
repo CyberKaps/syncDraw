@@ -77,15 +77,24 @@ app.post("/signin",async (req, res) => {
     
 });
 
-app.post("/room",middleware, (req, res) => {
+app.post("/room",middleware,async (req, res) => {
 
-    const data = CreateRoomSchema.safeParse(req.body);
-    if(!data.success) {
+    const parsedData = CreateRoomSchema.safeParse(req.body);
+    if(!parsedData.success) {
         res.status(400).json({
             error: "Invalid data"
         });
         return;
     }
+    // @ts-ignore TODO: fix this
+    const userId = req.userId;
+
+    await prismaClient.room.create({
+        data: {
+            slug: parsedData.data.name,
+            adminId: userId,
+        }
+    })
 
     res.json({
         roomId: 123
