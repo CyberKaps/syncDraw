@@ -4,6 +4,7 @@ import { middleware } from "./middleware";
 import { JWT_SECRET } from "@repo/backend-common/config";
 import { CreateUserSchema, SignInSchema, CreateRoomSchema } from "@repo/common/types";
 import { prismaClient } from "@repo/db/client";
+import { parse } from "path";
 
 
 const app = express();
@@ -24,6 +25,7 @@ app.post("/signup",async (req, res) => {
         const user = await prismaClient.user.create({
             data: {
                 email: parsedData.data.username,
+                //TODO: hash the password before storing it
                 password: parsedData.data.password,
                 name: parsedData.data.name
             }
@@ -40,19 +42,33 @@ app.post("/signup",async (req, res) => {
 
 });
 
-app.post("/signin", (req, res) => {
+app.post("/signin",async (req, res) => {
 
-    const data = SignInSchema.safeParse(req.body);
-    if(!data.success) {
+    const parsedData = SignInSchema.safeParse(req.body);
+    if(!parsedData.success) {
         res.status(400).json({
             error: "Invalid data"
         });
         return;
     }
 
-    const userId = 1;
+    // TODO: compare the hashed password here
+    const user = await prismaClient.user.findFirst({
+        where: {
+            email: parsedData.data.username,
+            password: parsedData.data.password
+        }
+    })
+
+    if(!user) {
+        res.status(403).json({
+            error: "Not authorized"
+        });
+        return;
+    }
+    
     const token = jwt.sign({
-        userId
+        userId: user.id,
     }, JWT_SECRET);
 
     res.json({
