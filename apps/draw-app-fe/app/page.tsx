@@ -20,13 +20,13 @@ function App() {
             </p>
             <div className="mt-10 flex items-center justify-center gap-x-6">
               <Link href={"/signin"}>
-                <Button variant={"primary"} size="lg" className="h-12 px-6 text-white bg-black rounded">
+                <Button className="h-12 px-6 text-white bg-black rounded">
                   Sign in
                   
                 </Button>
               </Link>
               <Link href="/signup">
-                <Button variant="outline" size="lg" className="h-12 px-6 border">
+                <Button className="h-12 px-6 border">
                   Sign up
                 </Button>
               </Link>
