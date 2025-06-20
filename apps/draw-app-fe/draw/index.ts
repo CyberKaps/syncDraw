@@ -1,3 +1,5 @@
+import { HTTP_BACKEND } from "@/config";
+import axios from "axios";
 
 type Shape = {
     type: "rect";
@@ -12,18 +14,18 @@ type Shape = {
     radius: number;
 }
 
-export function initDraw(canvas: HTMLCanvasElement) {
+export async function initDraw(canvas: HTMLCanvasElement, roomId: string) {
 
             const ctx = canvas.getContext("2d");
 
-            let existingShape: Shape[] = [];
+            let existingShape: Shape[] = await getExistingShapes(roomId);
 
             if(!ctx) {
                 return;
             }
 
-            ctx.fillStyle = "rgba(0,0,0)";
-            ctx.fillRect(0,0,canvas.width, canvas.height)
+            
+            clearCanvas(existingShape, canvas, ctx);
 
             let clicked = false;
             let startX = 0;
@@ -31,8 +33,8 @@ export function initDraw(canvas: HTMLCanvasElement) {
 
             canvas.addEventListener("mousedown", (e) => {
                 clicked = true;
-                startX = (e.clientX);
-                startY = (e.clientY);
+                startX = e.clientX;
+                startY = e.clientY;
             })
 
             canvas.addEventListener("mouseup", (e) => {
@@ -55,7 +57,7 @@ export function initDraw(canvas: HTMLCanvasElement) {
                     const height = e.clientY - startY;
                     clearCanvas(existingShape, canvas, ctx);
                     ctx.strokeStyle = "rgba(255,255,255)";
-                    ctx.strokeRect(startX, startX, width, height)
+                    ctx.strokeRect(startX, startY, width, height)
                 }
             })  
 
@@ -75,4 +77,17 @@ function clearCanvas(existingShape: Shape[], canvas: HTMLCanvasElement, ctx:Canv
                     }
                 })
 
+}
+
+async function getExistingShapes(roomId: string) {
+
+    const res = await axios.get(`${HTTP_BACKEND}/chats/roomId`);
+    const messages = res.data.messages;
+
+    const shapes = messages.map((x: {message: string}) => {
+        const messageData = JSON.parse(x.message);
+        return messageData;
+    })
+
+    return shapes;
 }
