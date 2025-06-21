@@ -1,8 +1,10 @@
 import { initDraw } from "@/draw";
+import { Socket } from "dgram";
 import { useEffect, useRef } from "react";
 
-export function Canvas({ roomId }: {
+export function Canvas({ roomId, socket }: {
     roomId: string;
+    socket: WebSocket;
 }) {
 
     const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -12,7 +14,7 @@ export function Canvas({ roomId }: {
 
         if(canvasRef.current) {
             
-            initDraw(canvasRef.current, roomId);
+            initDraw(canvasRef.current, roomId, socket);
         }
 
 
