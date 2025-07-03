@@ -16,6 +16,11 @@ syncDraw is a real-time collaborative whiteboard application that enables multip
 
 ---
 
+### 🧰 Canvas Tools
+
+- ✅ Rectangle tool
+- ⏳ Upcoming: Free draw, Eraser, Line, Circle, Diamond
+
 ## 🧰 Tech Stack
 
 | Layer         | Tech                             |
