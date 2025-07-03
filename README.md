@@ -16,10 +16,39 @@ syncDraw is a real-time collaborative whiteboard application that enables multip
 
 ---
 
+## ✅ Project Progress
+
+The core structure and functionality of **syncDraw** have been successfully implemented. Below is a summary of the current development status:
+
+- ✅ A scalable **monorepo architecture** has been set up using TurboRepo and PNPM.
+- ✅ A **real-time collaborative drawing canvas** has been built with support for rectangles.
+- ✅ Basic **user authentication** (Sign in / Sign up) pages are implemented.
+- ✅ A dedicated **WebSocket server** enables real-time synchronization across drawing sessions.
+- ✅ **Reusable UI components** and shared backend logic are organized into modular packages.
+- ✅ **Database integration** is handled via Prisma with initial schema and migrations completed.
+
+---
+
+## 🔄 Planned Enhancements
+
+Development is ongoing, with several exciting features planned for future updates:
+
+- ✏️ Add more drawing tools: **freehand**, **circle**, **line**
+- 🧼 Include utilities like **eraser**, **undo/redo**, and **clear canvas**
+- 📤 Enable users to **export drawings** as images
+- 👥 Show **user presence indicators**, such as live cursors in shared rooms
+- 💬 Implement **real-time in-room chat**
+- 🖼️ Improve **UI/UX** for accessibility and user interaction
+
+---
+
+
 ### 🧰 Canvas Tools
 
 - ✅ Rectangle tool
 - ⏳ Upcoming: Free draw, Eraser, Line, Circle, Diamond
+
+---
 
 ## 🧰 Tech Stack
 
@@ -36,33 +65,4 @@ syncDraw is a real-time collaborative whiteboard application that enables multip
 
 ## 🗂️ Monorepo Structure
 
-syncDraw/
-├── apps/                          # All individual apps live here
-│   ├── draw-app-fe/               # Frontend drawing app (Next.js)
-│   │   ├── app/                   # App routing (canvas, auth pages)
-│   │   ├── components/            # Reusable UI components (canvas, auth)
-│   │   ├── public/                # Static assets
-│   │   ├── config.ts              # Shared configs
-│   │   └── ...                    # Package & tool configs
-│   ├── http-backend/             # REST API backend (Express)
-│   │   └── src/                   # Server entrypoint & middleware
-│   ├── ws-backend/               # WebSocket server for real-time updates
-│   │   └── src/                   # WebSocket entrypoint
-│   └── web/                       # (Optional) Static landing page or chat frontend
-│       ├── components/           # Chat-related UI
-│       ├── hooks/                # Socket connection hooks
-│       └── app/room/[slug]/      # Dynamic room page
-│
-├── packages/                      # Shared packages (used by multiple apps)
-│   ├── common/                    # Shared TypeScript types and utils
-│   ├── db/                        # Prisma schema, DB config, migration
-│   ├── backend-common/           # Common backend logic
-│   └── ui/                        # Reusable UI components (Button, Card, etc.)
-│
-├── .vscode/                       # Editor settings
-├── .gitignore                     # Git ignored files
-├── turbo.json                     # Turborepo config
-├── pnpm-workspace.yaml            # Workspace config
-├── package.json                   # Root dependencies
-└── README.md                      # Project documentation
-
+![App Preview](./folderStructure.png)
