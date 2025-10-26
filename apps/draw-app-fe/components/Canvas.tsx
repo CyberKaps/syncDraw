@@ -1,7 +1,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { IconButton } from "./IconButton";
-import { Circle, Pencil, RectangleHorizontalIcon, ArrowUpRight, Diamond, Minus } from "lucide-react";
+import { Circle, Pencil, RectangleHorizontalIcon, ArrowUpRight, Diamond, Minus, Type } from "lucide-react";
 import { Game } from "@/draw/Game";
 
 export type Tool = "circle" | "pencil" | "rect" | "line" | "arrow" | "diamond" | "text";
@@ -71,6 +71,12 @@ function Topbar({selectedTool, setSelectedTool}: {
                 <IconButton onClick={() => setSelectedTool("line")} activated={selectedTool === "line"} icon={<Minus />} />
                 <IconButton onClick={() => setSelectedTool("arrow")} activated={selectedTool === "arrow"} icon={<ArrowUpRight />} />
                 <IconButton onClick={() => setSelectedTool("diamond")} activated={selectedTool === "diamond"} icon={<Diamond />} />
+                <IconButton
+                    onClick={() => setSelectedTool("text")}
+                    activated={selectedTool === "text"}
+                    icon={<Type />}
+                />
+
             </div>
         </div>
 }
