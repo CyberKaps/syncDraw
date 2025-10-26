@@ -1,5 +1,3 @@
-
-
 import { WebSocketServer } from 'ws';
 import jwt, { JwtPayload } from 'jsonwebtoken';
 import { JWT_SECRET } from "@repo/backend-common/config";
@@ -60,6 +58,7 @@ wss.on('connection', function connection(ws, request) {
 
     ws.on('message',async function message(data) {
         const parsedData = JSON.parse(data as unknown as string);
+        console.log('Received message type:', parsedData.type); // Debug log
 
         if (parsedData.type == "join_room") {
             const user = users.find(x => x.ws === ws);
@@ -78,9 +77,7 @@ wss.on('connection', function connection(ws, request) {
             const roomId =  parseInt(parsedData.roomId);
             const message = parsedData.message;
 
-
-
-             // ✅ Step 1: Check if room exists
+            // ✅ Step 1: Check if room exists
             const room = await prismaClient.room.findUnique({
                 where: { id: roomId }
             });
@@ -102,8 +99,9 @@ wss.on('connection', function connection(ws, request) {
                 }
             });
             
+            // Broadcast to all users in the room (EXCEPT the sender)
             users.forEach(user => {
-                if(user.rooms.includes(parsedData.roomId)) {
+                if(user.rooms.includes(parsedData.roomId) && user.ws !== ws) {
                     user.ws.send(JSON.stringify({
                         type: "chat",
                         message: message,
@@ -112,7 +110,33 @@ wss.on('connection', function connection(ws, request) {
                 }
             })
         }
+
+        //  Handle update messages for real-time drag/resize
+        if (parsedData.type === "update") {
+            const roomId = parsedData.roomId;
+            const message = parsedData.message;
+            
+            console.log('Broadcasting update to room:', roomId); // Debug log
+            
+            // Broadcast to all users in the room (EXCEPT the sender)
+            users.forEach(user => {
+                if(user.rooms.includes(roomId) && user.ws !== ws) {
+                    user.ws.send(JSON.stringify({
+                        type: "update",
+                        message: message,
+                        roomId
+                    }))
+                }
+            })
+        }
+    });
+
+    ws.on('close', () => {
+        // Remove user from users array when they disconnect
+        const index = users.findIndex(user => user.ws === ws);
+        if (index !== -1) {
+            users.splice(index, 1);
+        }
     });
     
-
 });
