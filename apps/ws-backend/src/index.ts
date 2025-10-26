@@ -75,20 +75,35 @@ wss.on('connection', function connection(ws, request) {
         }
 
         if (parsedData.type === "chat") {
-            const roomId = parsedData.roomId;
+            const roomId =  parseInt(parsedData.roomId);
             const message = parsedData.message;
 
 
+
+             // ✅ Step 1: Check if room exists
+            const room = await prismaClient.room.findUnique({
+                where: { id: roomId }
+            });
+
+            if (!room) {
+                // Optionally notify the client of failure
+                ws.send(JSON.stringify({
+                    type: "error",
+                    message: `Room ${roomId} does not exist.`
+                }));
+                return;
+            }
+
             await prismaClient.chat.create({
                 data: {
-                    roomId: parseInt(roomId),
+                    roomId: roomId,
                     message,
                     userId
                 }
             });
             
             users.forEach(user => {
-                if(user.rooms.includes(roomId)) {
+                if(user.rooms.includes(parsedData.roomId)) {
                     user.ws.send(JSON.stringify({
                         type: "chat",
                         message: message,
