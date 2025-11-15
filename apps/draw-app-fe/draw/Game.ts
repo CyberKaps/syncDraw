@@ -532,8 +532,8 @@ export class Game {
     this.existingShapes.push(shape);
     this.sendShapeUpdate(shape, "chat");
     
-    // Auto-switch to select tool and select the newly created shape
-    if (selectedTool !== "select") {
+    // Auto-switch to select tool and select the newly created shape (except for pencil tool)
+    if (selectedTool !== "select" && selectedTool !== "pencil") {
       this.selectedTool = "select";
       this.draggingShape = shape;
       this.draggingMode = null;
