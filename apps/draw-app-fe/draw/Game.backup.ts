@@ -98,7 +98,8 @@ export class Game {
         // Incoming shape deletion (eraser)
         if (message.type === "delete") {
           const parsed = JSON.parse(message.message);
-          const shapeIdToDelete = parsed.payload?.id;
+          // Handle both formats: { id: ... } or { payload: { id: ... } }
+          const shapeIdToDelete = parsed.id || parsed.payload?.id;
           if (shapeIdToDelete) {
             const idx = this.existingShapes.findIndex((s) => (s as any).id === shapeIdToDelete);
             if (idx >= 0) {
@@ -113,6 +114,13 @@ export class Game {
         if (message.type === "chat") {
           const parsedShape = JSON.parse(message.message);
           const incoming: Shape = parsedShape.shape;
+          
+          // Validate shape exists
+          if (!incoming || !incoming.type) {
+            console.warn("Received invalid shape:", parsedShape);
+            return;
+          }
+          
           if (!incoming.id) (incoming as any).id = this.genId();
           
           // Don't process our own messages if they echo back
@@ -133,6 +141,13 @@ export class Game {
         if (message.type === "update") {
           const parsed = JSON.parse(message.message);
           const incoming: Shape = parsed.shape;
+          
+          // Validate shape exists
+          if (!incoming || !incoming.type) {
+            console.warn("Received invalid shape update:", parsed);
+            return;
+          }
+          
           if (!incoming.id) (incoming as any).id = this.genId();
           
           // Don't process our own updates
