@@ -883,11 +883,41 @@ export class Game {
   private initZoomHandlers() {
     this.canvas.addEventListener("wheel", this.wheelHandler, { passive: false });
     
-    // Add keyboard shortcuts for zoom
+    // Add keyboard shortcuts for zoom and delete
     window.addEventListener("keydown", (e) => {
+      // Reset zoom shortcut
       if ((e.ctrlKey || e.metaKey) && e.key === "0") {
         e.preventDefault();
         this.resetView();
+      }
+      
+      // Delete selected shape with Delete or Backspace key
+      if ((e.key === "Delete" || e.key === "Backspace") && this.draggingShape) {
+        e.preventDefault();
+        const shapeToDelete = this.draggingShape;
+        const index = this.existingShapes.indexOf(shapeToDelete);
+        
+        if (index > -1) {
+          // Remove from local array
+          this.existingShapes.splice(index, 1);
+          
+          // Clear selection
+          this.draggingShape = null;
+          this.draggingMode = null;
+          this.resizeHandleIndex = null;
+          
+          // Redraw canvas
+          this.clearCanvas();
+          
+          // Broadcast deletion to other users
+          if (this.socket && this.socket.readyState === WebSocket.OPEN) {
+            this.socket.send(JSON.stringify({
+              type: "delete",
+              payload: { id: (shapeToDelete as any).id },
+              roomId: this.roomId
+            }));
+          }
+        }
       }
     });
   }
