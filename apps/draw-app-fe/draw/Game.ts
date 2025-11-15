@@ -484,7 +484,20 @@ export class Game {
     }
 
     if (this.draggingShape) {
-      this.sendShapeUpdate(this.draggingShape, "update");
+      // Only send update if the shape was actually dragged (not just clicked)
+      if (this.isDragging) {
+        this.sendShapeUpdate(this.draggingShape, "update");
+      }
+      
+      // Keep the shape selected if it was just clicked (not dragged)
+      if (!this.isDragging) {
+        this.clicked = false;
+        this.isDragging = false;
+        this.clearCanvas(); // Redraw to keep handles visible
+        return;
+      }
+      
+      // Deselect after dragging/resizing
       this.draggingShape = null;
       this.draggingMode = null;
       this.resizeHandleIndex = null;
@@ -588,9 +601,18 @@ export class Game {
     if (this.clicked && this.draggingShape && this.draggingMode) {
       const ds = this.draggingShape;
       
-      // Set isDragging to true once mouse starts moving
+      // Set isDragging to true only if mouse moved more than 3 pixels (drag threshold)
       if (!this.isDragging) {
-        this.isDragging = true;
+        const dx = Math.abs(x - this.startX);
+        const dy = Math.abs(y - this.startY);
+        const dragThreshold = 3;
+        
+        if (dx > dragThreshold || dy > dragThreshold) {
+          this.isDragging = true;
+        } else {
+          // Not enough movement yet, don't consider it a drag
+          return;
+        }
       }
 
       if (this.draggingMode === "move") {
