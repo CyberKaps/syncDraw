@@ -92,7 +92,7 @@ app.post("/room",middleware,async (req, res) => {
         });
         return;
     }
-    // @ts-ignore TODO: fix this
+    // @ts-ignore
     const userId = req.userId;
 
     try {
@@ -163,12 +163,19 @@ app.delete("/room/:slug", middleware, async (req, res) => {
             return;
         }
 
+        // Delete all chats (shapes) associated with this room first
+        await prismaClient.chat.deleteMany({
+            where: { roomId: room.id }
+        });
+
+        // Then delete the room
         await prismaClient.room.delete({
             where: { id: room.id }
         });
 
         res.json({ message: "Room deleted successfully" });
     } catch (error) {
+        console.error("Error deleting room:", error);
         res.status(500).json({ error: "Failed to delete room" });
     }
 });
