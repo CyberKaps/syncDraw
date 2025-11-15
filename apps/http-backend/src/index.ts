@@ -24,6 +24,8 @@ app.post("/signup",async (req, res) => {
         return;
     }
 
+    console.log(parsedData)
+
     try {
         const user = await prismaClient.user.create({
             data: {
@@ -38,6 +40,7 @@ app.post("/signup",async (req, res) => {
             userId: user.id,
         })
     } catch (error) {
+        console.log(error)
         res.status(411).json({
             error: "User already exists"
         });
