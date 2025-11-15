@@ -80,24 +80,26 @@ export function MiniMap({
     };
 
     return (
-        <div style={{
-            position: "fixed",
-            bottom: 20,
-            left: 20,
-            width: miniMapSize,
-            height: miniMapSize,
-            borderRadius: "8px",
-            overflow: "hidden",
-            boxShadow: "0 4px 6px rgba(0, 0, 0, 0.3)",
-            border: "2px solid rgba(255, 255, 255, 0.1)"
-        }}>
-            <canvas
-                ref={miniMapRef}
-                width={miniMapSize}
-                height={miniMapSize}
-                onClick={handleClick}
-                style={{ cursor: "pointer" }}
-            />
+        <div className="fixed bottom-6 left-6 z-50">
+            <div className="relative">
+                {/* Title */}
+                <div className="absolute -top-8 left-0 right-0 text-center">
+                    <div className="bg-gradient-to-br from-gray-900/90 to-gray-800/90 backdrop-blur-sm text-white text-xs px-3 py-1 rounded-t-xl shadow-lg border border-gray-700/50 border-b-0 inline-block">
+                        <span className="font-medium">Overview</span>
+                    </div>
+                </div>
+                
+                {/* MiniMap Canvas */}
+                <div className="bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 backdrop-blur-sm rounded-2xl shadow-2xl border-2 border-gray-700/50 overflow-hidden hover:border-blue-500/50 transition-all duration-200">
+                    <canvas
+                        ref={miniMapRef}
+                        width={miniMapSize}
+                        height={miniMapSize}
+                        onClick={handleClick}
+                        className="cursor-pointer"
+                    />
+                </div>
+            </div>
         </div>
     );
 }
