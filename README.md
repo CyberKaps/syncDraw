@@ -99,6 +99,7 @@ syncDraw is a feature-rich real-time collaborative whiteboard application that e
 - ✅ Drag to move shapes
 - ✅ Resize handles for shape adjustment
 - ✅ Shape deletion with eraser
+- ✅ Clear all drawings (erase entire canvas)
 - ✅ Text input with customizable size
 - ✅ Visual feedback for active tools
 - ✅ Back to home navigation
@@ -116,6 +117,7 @@ syncDraw is a feature-rich real-time collaborative whiteboard application that e
 - ✅ Multi-user concurrent drawing
 - ✅ Instant shape updates across clients
 - ✅ Real-time shape deletion sync
+- ✅ Real-time clear all sync (all users see canvas clear)
 - ✅ Shape transformation broadcasting
 - ✅ Persistent shape storage in database
 
@@ -354,7 +356,6 @@ Draw-app/
 Future features and improvements planned for syncDraw:
 
 - 🔄 **Undo/Redo** - Step backward and forward through drawing history
-- 🧹 **Clear Canvas** - Remove all shapes at once
 - 📤 **Export Drawings** - Save canvas as PNG/SVG
 - 🎨 **Color Picker** - Choose custom colors for shapes
 - 📏 **Stroke Width** - Adjust line thickness

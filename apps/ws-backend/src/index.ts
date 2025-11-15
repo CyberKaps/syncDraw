@@ -180,6 +180,36 @@ wss.on('connection', function connection(ws, request) {
                 }
             })
         }
+
+        // Handle clear all message
+        if (parsedData.type === "clear_all") {
+            const roomSlug = parsedData.roomId;
+            
+            console.log('Broadcasting clear_all to room:', roomSlug); // Debug log
+            
+            // Find the room and delete all shapes from database
+            const room = await prismaClient.room.findUnique({
+                where: { slug: roomSlug }
+            });
+
+            if (room) {
+                // Delete all chat entries (shapes) for this room
+                await prismaClient.chat.deleteMany({
+                    where: { roomId: room.id }
+                });
+                console.log('Cleared all shapes from database for room:', roomSlug);
+            }
+            
+            // Broadcast to all users in the room (EXCEPT the sender)
+            users.forEach(user => {
+                if(user.rooms.includes(roomSlug) && user.ws !== ws) {
+                    user.ws.send(JSON.stringify({
+                        type: "clear_all",
+                        roomId: roomSlug
+                    }))
+                }
+            })
+        }
     });
 
     ws.on('close', () => {

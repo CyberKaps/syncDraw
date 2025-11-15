@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { IconButton } from "./IconButton";
-import { Circle, Pencil, RectangleHorizontalIcon, ArrowUpRight, Diamond, Minus, Type, MousePointer2, Home, Eraser, ZoomIn, ZoomOut, Maximize2 } from "lucide-react";
+import { Circle, Pencil, RectangleHorizontalIcon, ArrowUpRight, Diamond, Minus, Type, MousePointer2, Home, Eraser, ZoomIn, ZoomOut, Maximize2, Trash2 } from "lucide-react";
 import { Game } from "@/draw/Game";
 import { useRouter } from "next/navigation";
 import { MiniMap } from "./MiniMap";
@@ -84,12 +84,26 @@ export function Canvas({
         }
     };
 
+    const handleClearAll = () => {
+        if (confirm("Are you sure you want to clear all drawings? This action cannot be undone.")) {
+            if (game) {
+                game.clearAllShapes();
+                setShapes([]);
+            }
+        }
+    };
+
     return <div style={{
         height: "100vh",
         overflow: "hidden"
     }}>
         <canvas ref={canvasRef} width={window.innerWidth} height={window.innerHeight}></canvas>
-        <Topbar setSelectedTool={setSelectedTool} selectedTool={selectedTool} onGoHome={handleGoHome} />
+        <Topbar 
+            setSelectedTool={setSelectedTool} 
+            selectedTool={selectedTool} 
+            onGoHome={handleGoHome}
+            onClearAll={handleClearAll}
+        />
         <ZoomControls 
             zoom={zoom} 
             onZoomIn={handleZoomIn} 
@@ -108,10 +122,11 @@ export function Canvas({
     </div>
 }
 
-function Topbar({selectedTool, setSelectedTool, onGoHome}: {
+function Topbar({selectedTool, setSelectedTool, onGoHome, onClearAll}: {
     selectedTool: Tool,
     setSelectedTool: (s: Tool) => void,
-    onGoHome: () => void
+    onGoHome: () => void,
+    onClearAll: () => void
 }) {
     const tools = [
         { id: "select" as Tool, icon: <MousePointer2 />, label: "Select", group: "basic" },
@@ -193,14 +208,25 @@ function Topbar({selectedTool, setSelectedTool, onGoHome}: {
                     </div> */}
                 </div>
 
-                {/* Right side - Home button */}
-                <button
-                    onClick={onGoHome}
-                    className="bg-gradient-to-br from-red-600 to-red-700 text-white px-5 py-3 rounded-xl hover:from-red-500 hover:to-red-600 transition-all duration-200 flex items-center gap-2 shadow-xl border border-red-500/30 hover:shadow-red-500/20 hover:scale-105"
-                >
-                    <Home className="h-5 w-5" />
-                    <span className="hidden sm:inline font-medium">Exit Room</span>
-                </button>
+                {/* Right side - Action buttons */}
+                <div className="flex gap-3">
+                    <button
+                        onClick={onClearAll}
+                        className="bg-gradient-to-br from-orange-600 to-orange-700 text-white px-5 py-3 rounded-xl hover:from-orange-500 hover:to-orange-600 transition-all duration-200 flex items-center gap-2 shadow-xl border border-orange-500/30 hover:shadow-orange-500/20 hover:scale-105"
+                        title="Clear all drawings"
+                    >
+                        <Trash2 className="h-5 w-5" />
+                        <span className="hidden sm:inline font-medium">Clear All</span>
+                    </button>
+                    
+                    <button
+                        onClick={onGoHome}
+                        className="bg-gradient-to-br from-red-600 to-red-700 text-white px-5 py-3 rounded-xl hover:from-red-500 hover:to-red-600 transition-all duration-200 flex items-center gap-2 shadow-xl border border-red-500/30 hover:shadow-red-500/20 hover:scale-105"
+                    >
+                        <Home className="h-5 w-5" />
+                        <span className="hidden sm:inline font-medium">Exit Room</span>
+                    </button>
+                </div>
             </div>
         </div>
     );

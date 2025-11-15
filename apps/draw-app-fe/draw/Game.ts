@@ -81,6 +81,13 @@ export class Game {
         const message = JSON.parse(event.data);
         console.log("Received message:", message); // Debug log
 
+        // Incoming clear all request
+        if (message.type === "clear_all") {
+          this.existingShapes = [];
+          this.clearCanvas();
+          return;
+        }
+
         // Incoming shape deletion (eraser)
         if (message.type === "delete") {
           const parsed = JSON.parse(message.message);
@@ -779,6 +786,20 @@ export class Game {
 
   public getShapes(): Shape[] {
     return this.existingShapes;
+  }
+
+  public clearAllShapes() {
+    // Clear all shapes locally
+    this.existingShapes = [];
+    this.clearCanvas();
+    
+    // Broadcast clear all to other users
+    if (this.socket && this.socket.readyState === WebSocket.OPEN) {
+      this.socket.send(JSON.stringify({
+        type: "clear_all",
+        roomId: this.roomId
+      }));
+    }
   }
 
   private wheelHandler = (e: WheelEvent) => {
