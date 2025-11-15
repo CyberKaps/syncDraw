@@ -1,8 +1,10 @@
 
+
 import { useEffect, useRef, useState } from "react";
 import { IconButton } from "./IconButton";
-import { Circle, Pencil, RectangleHorizontalIcon, ArrowUpRight, Diamond, Minus, Type, MousePointer2 } from "lucide-react";
+import { Circle, Pencil, RectangleHorizontalIcon, ArrowUpRight, Diamond, Minus, Type, MousePointer2, Home } from "lucide-react";
 import { Game } from "@/draw/Game";
+import { useRouter } from "next/navigation";
 
 export type Tool = "circle" | "pencil" | "rect" | "line" | "arrow" | "diamond" | "text" | "select";
 
@@ -16,6 +18,7 @@ export function Canvas({
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const [game, setGame] = useState<Game>();
     const [selectedTool, setSelectedTool] = useState<Tool>("circle")
+    const router = useRouter();
 
     useEffect(() => {
         game?.setTool(selectedTool);
@@ -35,23 +38,34 @@ export function Canvas({
 
     }, [canvasRef]);
 
+    const handleGoHome = () => {
+        if (confirm("Are you sure you want to leave this room?")) {
+            router.push("/");
+        }
+    };
+
     return <div style={{
         height: "100vh",
         overflow: "hidden"
     }}>
         <canvas ref={canvasRef} width={window.innerWidth} height={window.innerHeight}></canvas>
-        <Topbar setSelectedTool={setSelectedTool} selectedTool={selectedTool} />
+        <Topbar setSelectedTool={setSelectedTool} selectedTool={selectedTool} onGoHome={handleGoHome} />
     </div>
 }
 
-function Topbar({selectedTool, setSelectedTool}: {
+function Topbar({selectedTool, setSelectedTool, onGoHome}: {
     selectedTool: Tool,
-    setSelectedTool: (s: Tool) => void
+    setSelectedTool: (s: Tool) => void,
+    onGoHome: () => void
 }) {
     return <div style={{
             position: "fixed",
             top: 10,
-            left: 10
+            left: 10,
+            right: 10,
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center"
         }}>
             <div className="flex gap-4">
                 <IconButton 
@@ -80,8 +94,15 @@ function Topbar({selectedTool, setSelectedTool}: {
                     onClick={() => setSelectedTool("select")}
                     activated={selectedTool === "select"}
                     icon={<MousePointer2 />}
-                    />
-
+                />
             </div>
+            
+            <button
+                onClick={onGoHome}
+                className="bg-gray-900 text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition-colors flex items-center gap-2 shadow-lg"
+            >
+                <Home className="h-4 w-4" />
+                <span className="hidden sm:inline">Back to Home</span>
+            </button>
         </div>
 }

@@ -8,6 +8,8 @@ import { useRouter } from "next/navigation";
 
 export function CreateRoom() {
   const [roomName, setRoomName] = useState("");
+  const [password, setPassword] = useState("");
+  const [usePassword, setUsePassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
@@ -25,9 +27,14 @@ export function CreateRoom() {
     }
 
     try {
+      const payload: any = { name: roomName };
+      if (usePassword && password) {
+        payload.password = password;
+      }
+
       const response = await axios.post(
         `${HTTP_BACKEND}/room`,
-        { name: roomName },
+        payload,
         {
           headers: {
             Authorization: token,
@@ -35,9 +42,9 @@ export function CreateRoom() {
         }
       );
 
-      const { roomId } = response.data;
-      if (roomId) {
-        router.push(`/canvas/${roomName}`);
+      const { slug } = response.data;
+      if (slug) {
+        router.push(`/canvas/${slug}`);
       } else {
         throw new Error("Failed to create room");
       }
@@ -69,6 +76,34 @@ export function CreateRoom() {
           className="w-full"
         />
       </div>
+
+      <div className="mb-4">
+        <label className="flex items-center gap-2 cursor-pointer">
+          <input
+            type="checkbox"
+            checked={usePassword}
+            onChange={(e) => setUsePassword(e.target.checked)}
+            className="w-4 h-4 text-indigo-600 rounded focus:ring-indigo-500"
+          />
+          <span className="text-sm font-medium text-gray-700">
+            Protect with password (optional)
+          </span>
+        </label>
+      </div>
+
+      {usePassword && (
+        <div className="mb-4">
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Password
+          </label>
+          <Input
+            type="password"
+            placeholder="Enter room password"
+            onChange={(e) => setPassword(e.target.value)}
+            className="w-full"
+          />
+        </div>
+      )}
 
       {error && (
         <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">

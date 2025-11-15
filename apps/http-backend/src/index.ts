@@ -2,7 +2,7 @@ import express from "express";
 import jwt from "jsonwebtoken";
 import { middleware } from "./middleware";
 import { JWT_SECRET } from "@repo/backend-common/config";
-import { CreateUserSchema, SignInSchema, CreateRoomSchema } from "@repo/common/types";
+import { CreateUserSchema, SignInSchema, CreateRoomSchema, JoinRoomSchema } from "@repo/common/types";
 import { prismaClient } from "@repo/db/client";
 
 import cors from "cors"
@@ -99,17 +99,116 @@ app.post("/room",middleware,async (req, res) => {
         const room = await prismaClient.room.create({
         data: {
             slug: parsedData.data.name,
+            password: parsedData.data.password || null,
             adminId: userId,
         }
     })
 
     res.json({
-        roomId: room.id
+        roomId: room.id,
+        slug: room.slug
     })
     } catch (error) {
         res.status(411).json({
             error: "Room already exists"
         });
+    }
+});
+
+// Get user's rooms
+app.get("/user/rooms", middleware, async (req, res) => {
+    try {
+        // @ts-ignore
+        const userId = req.userId;
+        
+        const rooms = await prismaClient.room.findMany({
+            where: {
+                adminId: userId
+            },
+            orderBy: {
+                createdAt: 'desc'
+            },
+            select: {
+                id: true,
+                slug: true,
+                password: true,
+                createdAt: true
+            }
+        });
+
+        res.json({ rooms });
+    } catch (error) {
+        res.status(500).json({ error: "Failed to fetch rooms" });
+    }
+});
+
+// Delete room
+app.delete("/room/:slug", middleware, async (req, res) => {
+    try {
+        // @ts-ignore
+        const userId = req.userId;
+        const slug = req.params.slug;
+
+        const room = await prismaClient.room.findFirst({
+            where: { slug }
+        });
+
+        if (!room) {
+            res.status(404).json({ error: "Room not found" });
+            return;
+        }
+
+        if (room.adminId !== userId) {
+            res.status(403).json({ error: "Not authorized to delete this room" });
+            return;
+        }
+
+        await prismaClient.room.delete({
+            where: { id: room.id }
+        });
+
+        res.json({ message: "Room deleted successfully" });
+    } catch (error) {
+        res.status(500).json({ error: "Failed to delete room" });
+    }
+});
+
+// Verify room password
+app.post("/room/verify", async (req, res) => {
+    try {
+        const parsedData = JoinRoomSchema.safeParse(req.body);
+        if (!parsedData.success) {
+            res.status(400).json({ error: "Invalid data" });
+            return;
+        }
+
+        const room = await prismaClient.room.findFirst({
+            where: { slug: parsedData.data.slug }
+        });
+
+        if (!room) {
+            res.status(404).json({ error: "Room not found" });
+            return;
+        }
+
+        // If room has password, verify it
+        if (room.password) {
+            if (!parsedData.data.password || room.password !== parsedData.data.password) {
+                res.status(403).json({ error: "Incorrect password" });
+                return;
+            }
+        }
+
+        res.json({ 
+            success: true,
+            room: {
+                id: room.id,
+                slug: room.slug,
+                hasPassword: !!room.password
+            }
+        });
+    } catch (error) {
+        res.status(500).json({ error: "Failed to verify room" });
     }
 });
 

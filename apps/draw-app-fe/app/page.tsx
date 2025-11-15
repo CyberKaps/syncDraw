@@ -7,6 +7,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { CreateRoom } from "@/components/CreateRoom";
 import { JoinRoom } from "@/components/JoinRoom";
+import { Dashboard } from "@/components/Dashboard";
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -180,6 +181,15 @@ function App() {
           </div>
         </div>
       </header>
+
+      {/* Dashboard Section - Only visible when logged in */}
+      {isLoggedIn && (
+        <section className="py-16 bg-white border-t border-gray-100">
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+            <Dashboard />
+          </div>
+        </section>
+      )}
 
       {/* Features Section */}
       <section id="features" className="py-24 bg-white">

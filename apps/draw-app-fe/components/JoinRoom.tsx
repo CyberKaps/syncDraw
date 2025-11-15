@@ -8,6 +8,8 @@ import { useRouter } from "next/navigation";
 
 export function JoinRoom() {
   const [roomSlug, setRoomSlug] = useState("");
+  const [password, setPassword] = useState("");
+  const [showPasswordField, setShowPasswordField] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
@@ -23,17 +25,28 @@ export function JoinRoom() {
     }
 
     try {
-      const response = await axios.get(`${HTTP_BACKEND}/room/${roomSlug}`);
+      // First, verify the room and check if password is needed
+      const verifyResponse = await axios.post(`${HTTP_BACKEND}/room/verify`, {
+        slug: roomSlug,
+        password: password || undefined
+      });
 
-      const { room } = response.data;
-      if (room) {
+      if (verifyResponse.data.success) {
         router.push(`/canvas/${roomSlug}`);
-      } else {
-        setError("Room not found");
       }
     } catch (err: any) {
-      const message = err.response?.data?.error || "Room not found";
-      setError(message);
+      const errorMessage = err.response?.data?.error;
+      
+      if (errorMessage === "Incorrect password") {
+        setError("Incorrect password");
+        setShowPasswordField(true);
+      } else if (err.response?.status === 403 && !showPasswordField) {
+        // Room requires password
+        setShowPasswordField(true);
+        setError("This room requires a password");
+      } else {
+        setError(errorMessage || "Room not found");
+      }
     } finally {
       setLoading(false);
     }
@@ -64,6 +77,25 @@ export function JoinRoom() {
           className="w-full"
         />
       </div>
+
+      {showPasswordField && (
+        <div className="mb-4">
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Password
+          </label>
+          <Input
+            type="password"
+            placeholder="Enter room password"
+            onChange={(e) => setPassword(e.target.value)}
+            onKeyPress={(e) => {
+              if (e.key === 'Enter') {
+                handleJoinRoom();
+              }
+            }}
+            className="w-full"
+          />
+        </div>
+      )}
 
       {error && (
         <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
