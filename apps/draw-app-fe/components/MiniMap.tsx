@@ -45,7 +45,8 @@ export function MiniMap({
         ctx.fillStyle = "rgba(255, 255, 255, 0.5)";
         ctx.lineWidth = 1;
 
-        shapes.forEach((shape) => {
+        // Filter out invalid shapes before rendering
+        shapes.filter(shape => shape && shape.type).forEach((shape) => {
             drawShapeOnMiniMap(ctx, shape);
         });
 
