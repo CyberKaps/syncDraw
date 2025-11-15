@@ -32,6 +32,9 @@ export class Game {
   private minZoom = 0.1;
   private maxZoom = 5;
 
+  // Callback for tool change
+  private onToolChange?: (tool: Tool) => void;
+
   socket: WebSocket;
 
   constructor(canvas: HTMLCanvasElement, roomId: string, socket: WebSocket) {
@@ -64,6 +67,10 @@ export class Game {
     this.draggingMode = null;
     this.resizeHandleIndex = null;
     this.isDragging = false;
+  }
+
+  setToolChangeCallback(callback: (tool: Tool) => void) {
+    this.onToolChange = callback;
   }
 
   async init() {
@@ -406,6 +413,16 @@ export class Game {
             } as any;
             this.existingShapes.push(shape);
             this.sendShapeUpdate(shape, "chat");
+            
+            // Auto-switch to select tool and select the text
+            this.selectedTool = "select";
+            this.draggingShape = shape;
+            
+            // Notify Canvas component to update UI
+            if (this.onToolChange) {
+              this.onToolChange("select");
+            }
+            
             this.clearCanvas();
           }
           document.body.removeChild(input);
@@ -418,25 +435,35 @@ export class Game {
       return;
     }
 
-    const picked = this.pickShapeAt(x, y);
-    if (picked && picked.shape) {
-      this.draggingShape = picked.shape;
-      this.startX = x;
-      this.startY = y;
-      this.isDragging = true;
+    // Only allow shape selection/dragging/resizing with select tool
+    if (this.selectedTool === "select") {
+      const picked = this.pickShapeAt(x, y);
+      if (picked && picked.shape) {
+        this.draggingShape = picked.shape;
+        this.startX = x;
+        this.startY = y;
+        this.isDragging = false; // Changed to false - will be set to true on mousemove
 
-      if (picked.handleIndex !== null) {
-        this.draggingMode = "resize";
-        this.resizeHandleIndex = picked.handleIndex;
-      } else {
-        this.draggingMode = "move";
-        this.resizeHandleIndex = null;
-        const bb = this.getBoundingBox(picked.shape);
-        this.dragOffset = { x: x - bb.x, y: y - bb.y };
+        if (picked.handleIndex !== null) {
+          this.draggingMode = "resize";
+          this.resizeHandleIndex = picked.handleIndex;
+        } else {
+          this.draggingMode = "move";
+          this.resizeHandleIndex = null;
+          const bb = this.getBoundingBox(picked.shape);
+          this.dragOffset = { x: x - bb.x, y: y - bb.y };
+        }
+
+        this.clicked = true;
+        this.clearCanvas(); // Redraw to show handles
+        return;
       }
-
-      this.clicked = true;
-      return;
+      
+      // If select tool is active and clicked on empty space, deselect current shape
+      this.draggingShape = null;
+      this.draggingMode = null;
+      this.resizeHandleIndex = null;
+      this.clearCanvas();
     }
 
     this.clicked = true;
@@ -504,6 +531,20 @@ export class Game {
 
     this.existingShapes.push(shape);
     this.sendShapeUpdate(shape, "chat");
+    
+    // Auto-switch to select tool and select the newly created shape
+    if (selectedTool !== "select") {
+      this.selectedTool = "select";
+      this.draggingShape = shape;
+      this.draggingMode = null;
+      this.resizeHandleIndex = null;
+      
+      // Notify Canvas component to update UI
+      if (this.onToolChange) {
+        this.onToolChange("select");
+      }
+    }
+    
     this.clearCanvas();
   };
 
@@ -546,6 +587,11 @@ export class Game {
 
     if (this.clicked && this.draggingShape && this.draggingMode) {
       const ds = this.draggingShape;
+      
+      // Set isDragging to true once mouse starts moving
+      if (!this.isDragging) {
+        this.isDragging = true;
+      }
 
       if (this.draggingMode === "move") {
         const bb = this.getBoundingBox(ds);

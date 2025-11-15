@@ -33,6 +33,11 @@ export function Canvas({
             const g = new Game(canvasRef.current, roomId, socket);
             setGame(g);
 
+            // Set callback for tool changes from Game
+            g.setToolChangeCallback((tool) => {
+                setSelectedTool(tool);
+            });
+
             // Update shapes periodically for mini-map
             const interval = setInterval(() => {
                 setShapes([...g.getShapes()]);
