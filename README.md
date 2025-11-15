@@ -8,7 +8,7 @@ syncDraw is a feature-rich real-time collaborative whiteboard application that e
 
 ### 🎨 Drawing & Collaboration
 - **Real-time Collaborative Canvas** - Multiple users can draw simultaneously with instant synchronization
-- **Rich Drawing Tools** - 8 professional drawing tools including:
+- **Rich Drawing Tools** - 9 professional drawing tools including:
   - ✏️ **Pencil** - Freehand drawing
   - ⭕ **Circle** - Perfect circles with adjustable radius
   - ▭ **Rectangle** - Rectangular shapes
@@ -19,6 +19,12 @@ syncDraw is a feature-rich real-time collaborative whiteboard application that e
   - 🖱️ **Select** - Move and resize shapes with drag handles
   - 🧹 **Eraser** - Remove shapes with click or drag
 - **Shape Manipulation** - Drag to move, resize handles for precise adjustments
+- **Zoom & Pan** - Navigate large canvases with ease
+  - 🔍 **Mouse Wheel Zoom** - Zoom in/out with scroll wheel
+  - 🖱️ **Pan Canvas** - Shift + Drag to pan around
+  - 📏 **Zoom Controls** - UI buttons for zoom in/out/reset
+  - 🗺️ **Mini-Map** - Overview panel showing entire canvas with viewport indicator
+  - ⌨️ **Keyboard Shortcuts** - Ctrl+0 to reset zoom
 - **Live Updates** - See other users' drawings in real-time via WebSocket
 
 ### 🔐 Authentication & User Management
@@ -87,7 +93,7 @@ syncDraw is a feature-rich real-time collaborative whiteboard application that e
 
 ### Canvas Features
 - ✅ Full-featured drawing canvas
-- ✅ 8 different drawing tools
+- ✅ 9 different drawing tools
 - ✅ Real-time shape synchronization
 - ✅ Shape selection and manipulation
 - ✅ Drag to move shapes
@@ -96,6 +102,14 @@ syncDraw is a feature-rich real-time collaborative whiteboard application that e
 - ✅ Text input with customizable size
 - ✅ Visual feedback for active tools
 - ✅ Back to home navigation
+- ✅ Zoom in/out with mouse wheel
+- ✅ Pan canvas with Shift + Drag
+- ✅ Zoom controls UI (buttons)
+- ✅ Mini-map for canvas overview
+- ✅ Viewport indicator on mini-map
+- ✅ Click mini-map to navigate
+- ✅ Reset zoom with keyboard shortcut (Ctrl+0)
+- ✅ Zoom range: 10% to 500%
 
 ### Real-time Collaboration
 - ✅ WebSocket-based synchronization
@@ -335,7 +349,7 @@ Draw-app/
 
 ---
 
-## � Planned Enhancements
+## 🔄 Planned Enhancements
 
 Future features and improvements planned for syncDraw:
 
@@ -350,8 +364,6 @@ Future features and improvements planned for syncDraw:
 - 📱 **Mobile Support** - Touch-optimized drawing experience
 - 🌙 **Dark/Light Mode** - Theme switching
 - 📋 **Shape Layers** - Z-index management for overlapping shapes
-- 🔍 **Zoom & Pan** - Navigate large canvases
-- 📌 **Pin Important Shapes** - Lock shapes from editing
 
 ---
 
