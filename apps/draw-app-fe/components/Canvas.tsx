@@ -2,11 +2,11 @@
 
 import { useEffect, useRef, useState } from "react";
 import { IconButton } from "./IconButton";
-import { Circle, Pencil, RectangleHorizontalIcon, ArrowUpRight, Diamond, Minus, Type, MousePointer2, Home } from "lucide-react";
+import { Circle, Pencil, RectangleHorizontalIcon, ArrowUpRight, Diamond, Minus, Type, MousePointer2, Home, Eraser } from "lucide-react";
 import { Game } from "@/draw/Game";
 import { useRouter } from "next/navigation";
 
-export type Tool = "circle" | "pencil" | "rect" | "line" | "arrow" | "diamond" | "text" | "select";
+export type Tool = "circle" | "pencil" | "rect" | "line" | "arrow" | "diamond" | "text" | "select" | "eraser";
 
 export function Canvas({
     roomId,
@@ -74,6 +74,11 @@ function Topbar({selectedTool, setSelectedTool, onGoHome}: {
                     }}
                     activated={selectedTool === "pencil"}
                     icon={<Pencil />}
+                />
+                <IconButton 
+                    onClick={() => setSelectedTool("eraser")}
+                    activated={selectedTool === "eraser"}
+                    icon={<Eraser />}
                 />
                 <IconButton onClick={() => {
                     setSelectedTool("rect")

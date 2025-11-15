@@ -69,6 +69,20 @@ export class Game {
         const message = JSON.parse(event.data);
         console.log("Received message:", message); // Debug log
 
+        // Incoming shape deletion (eraser)
+        if (message.type === "delete") {
+          const parsed = JSON.parse(message.message);
+          const shapeIdToDelete = parsed.payload?.id;
+          if (shapeIdToDelete) {
+            const idx = this.existingShapes.findIndex((s) => (s as any).id === shapeIdToDelete);
+            if (idx >= 0) {
+              this.existingShapes.splice(idx, 1);
+              this.clearCanvas();
+            }
+          }
+          return;
+        }
+
         // Incoming shape creation
         if (message.type === "chat") {
           const parsedShape = JSON.parse(message.message);
@@ -298,6 +312,28 @@ export class Game {
     const x = e.clientX;
     const y = e.clientY;
 
+    if (this.selectedTool === "eraser") {
+      const picked = this.pickShapeAt(x, y);
+      if (picked && picked.shape) {
+        const shapeToDelete = picked.shape;
+        const index = this.existingShapes.indexOf(shapeToDelete);
+        if (index > -1) {
+          this.existingShapes.splice(index, 1);
+          this.clearCanvas();
+          // Broadcast deletion to other users
+          if (this.socket && this.socket.readyState === WebSocket.OPEN) {
+            this.socket.send(JSON.stringify({
+              type: "delete",
+              payload: { id: (shapeToDelete as any).id },
+              roomId: this.roomId
+            }));
+          }
+        }
+      }
+      this.clicked = true;
+      return;
+    }
+
     if (this.selectedTool === "text") {
       if (this.activeTextInput) {
         document.body.removeChild(this.activeTextInput);
@@ -425,6 +461,28 @@ export class Game {
   mouseMoveHandler = (e: MouseEvent) => {
     const x = e.clientX;
     const y = e.clientY;
+
+    // Handle continuous erasing while mouse is down
+    if (this.clicked && this.selectedTool === "eraser") {
+      const picked = this.pickShapeAt(x, y);
+      if (picked && picked.shape) {
+        const shapeToDelete = picked.shape;
+        const index = this.existingShapes.indexOf(shapeToDelete);
+        if (index > -1) {
+          this.existingShapes.splice(index, 1);
+          this.clearCanvas();
+          // Broadcast deletion to other users
+          if (this.socket && this.socket.readyState === WebSocket.OPEN) {
+            this.socket.send(JSON.stringify({
+              type: "delete",
+              payload: { id: (shapeToDelete as any).id },
+              roomId: this.roomId
+            }));
+          }
+        }
+      }
+      return;
+    }
 
     if (this.clicked && this.draggingShape && this.draggingMode) {
       const ds = this.draggingShape;

@@ -129,6 +129,25 @@ wss.on('connection', function connection(ws, request) {
                 }
             })
         }
+
+        // Handle delete messages for eraser tool
+        if (parsedData.type === "delete") {
+            const roomId = parsedData.roomId;
+            const payload = parsedData.payload;
+            
+            console.log('Broadcasting delete to room:', roomId, 'payload:', payload); // Debug log
+            
+            // Broadcast to all users in the room (EXCEPT the sender)
+            users.forEach(user => {
+                if(user.rooms.includes(roomId) && user.ws !== ws) {
+                    user.ws.send(JSON.stringify({
+                        type: "delete",
+                        message: JSON.stringify({ payload }),
+                        roomId
+                    }))
+                }
+            })
+        }
     });
 
     ws.on('close', () => {
