@@ -132,18 +132,50 @@ wss.on('connection', function connection(ws, request) {
 
         // Handle delete messages for eraser tool
         if (parsedData.type === "delete") {
-            const roomId = parsedData.roomId;
+            const roomSlug = parsedData.roomId;
             const payload = parsedData.payload;
+            const shapeId = payload?.id;
             
-            console.log('Broadcasting delete to room:', roomId, 'payload:', payload); // Debug log
+            console.log('Broadcasting delete to room:', roomSlug, 'shapeId:', shapeId); // Debug log
+            
+            // Find the room
+            const room = await prismaClient.room.findUnique({
+                where: { slug: roomSlug }
+            });
+
+            if (room && shapeId) {
+                // Find and delete the chat entry containing this shape
+                // Since shapes are stored as JSON in the message field, we need to find by checking the JSON content
+                const chats = await prismaClient.chat.findMany({
+                    where: { roomId: room.id }
+                });
+
+                // Find the chat entry that contains this shape ID
+                for (const chat of chats) {
+                    try {
+                        const messageData = JSON.parse(chat.message);
+                        if (messageData.shape && messageData.shape.id === shapeId) {
+                            // Delete this chat entry from database
+                            await prismaClient.chat.delete({
+                                where: { id: chat.id }
+                            });
+                            console.log('Deleted shape from database:', shapeId);
+                            break;
+                        }
+                    } catch (e) {
+                        // Skip invalid JSON entries
+                        continue;
+                    }
+                }
+            }
             
             // Broadcast to all users in the room (EXCEPT the sender)
             users.forEach(user => {
-                if(user.rooms.includes(roomId) && user.ws !== ws) {
+                if(user.rooms.includes(roomSlug) && user.ws !== ws) {
                     user.ws.send(JSON.stringify({
                         type: "delete",
                         message: JSON.stringify({ payload }),
-                        roomId
+                        roomId: roomSlug
                     }))
                 }
             })
