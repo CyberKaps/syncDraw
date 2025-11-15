@@ -74,26 +74,26 @@ wss.on('connection', function connection(ws, request) {
         }
 
         if (parsedData.type === "chat") {
-            const roomId =  parseInt(parsedData.roomId);
+            const roomSlug = parsedData.roomId; // This is actually the room slug, not id
             const message = parsedData.message;
 
-            // ✅ Step 1: Check if room exists
+            // ✅ Step 1: Check if room exists and get its id
             const room = await prismaClient.room.findUnique({
-                where: { id: roomId }
+                where: { slug: roomSlug }
             });
 
             if (!room) {
                 // Optionally notify the client of failure
                 ws.send(JSON.stringify({
                     type: "error",
-                    message: `Room ${roomId} does not exist.`
+                    message: `Room ${roomSlug} does not exist.`
                 }));
                 return;
             }
 
             await prismaClient.chat.create({
                 data: {
-                    roomId: roomId,
+                    roomId: room.id,
                     message,
                     userId
                 }
@@ -105,7 +105,7 @@ wss.on('connection', function connection(ws, request) {
                     user.ws.send(JSON.stringify({
                         type: "chat",
                         message: message,
-                        roomId
+                        roomId: parsedData.roomId
                     }))
                 }
             })
