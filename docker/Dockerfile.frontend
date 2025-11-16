@@ -29,9 +29,6 @@ COPY --from=deps /usr/src/app/packages ./packages
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml turbo.json ./
 COPY apps/draw-app-fe ./apps/draw-app-fe
 
-ARG NEXT_PUBLIC_HTTP_BACKEND_URL=http://localhost:3001
-ARG NEXT_PUBLIC_WS_BACKEND_URL=ws://localhost:8080
-
 ENV NEXT_PUBLIC_HTTP_BACKEND_URL=$NEXT_PUBLIC_HTTP_BACKEND_URL
 ENV NEXT_PUBLIC_WS_BACKEND_URL=$NEXT_PUBLIC_WS_BACKEND_URL
 

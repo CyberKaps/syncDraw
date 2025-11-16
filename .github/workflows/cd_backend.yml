@@ -32,6 +32,9 @@ jobs:
           file: ./docker/Dockerfile.backend
           push: true
           tags: cyberkaps/sync-backend:${{ github.sha }},cyberkaps/sync-backend:latest
+          build-args: |
+            DATABASE_URL=${{ secrets.DATABASE_URL }}
+            JWT_SECRET=${{ secrets.JWT_SECRET }}
 
       # - name: SSH and deploy to VM
       #   uses: appleboy/ssh-action@v0.1.6
