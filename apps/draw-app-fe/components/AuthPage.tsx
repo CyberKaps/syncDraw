@@ -46,8 +46,8 @@ export function AuthPage({ isSignin }: { isSignin: boolean }) {
           throw new Error("Signup failed");
         }
       }
-    } catch (err: any) {
-      const message = err.response?.data?.error || "Authentication failed";
+    } catch (err) {
+      const message = (err as { response?: { data?: { error?: string } } }).response?.data?.error || "Authentication failed";
       setError(message);
     } finally {
       setLoading(false);
@@ -76,7 +76,7 @@ export function AuthPage({ isSignin }: { isSignin: boolean }) {
             <Input
               type="text"
               placeholder="John Doe"
-              onChange={(e: any) => setName(e.target.value)}
+              onChange={(e) => setName(e.target.value)}
               className="w-full"
             />
           </div>
@@ -89,7 +89,7 @@ export function AuthPage({ isSignin }: { isSignin: boolean }) {
           <Input
             type="text"
             placeholder="you@example.com"
-            onChange={(e: any) => setEmail(e.target.value)}
+            onChange={(e) => setEmail(e.target.value)}
             className="w-full"
           />
         </div>
@@ -101,7 +101,7 @@ export function AuthPage({ isSignin }: { isSignin: boolean }) {
           <Input
             type="password"
             placeholder="Enter your password"
-            onChange={(e: any) => setPassword(e.target.value)}
+            onChange={(e) => setPassword(e.target.value)}
             className="w-full"
           />
         </div>

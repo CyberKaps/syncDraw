@@ -306,7 +306,7 @@ function App() {
               </div>
               <h3 className="text-xl font-semibold text-gray-900 mb-3">Start Drawing</h3>
               <p className="text-gray-600">
-                Collaborate in real-time with your team. It's that simple!
+                Collaborate in real-time with your team. It&apos;s that simple!
               </p>
             </div>
           </div>

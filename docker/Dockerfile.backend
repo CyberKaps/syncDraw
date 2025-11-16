@@ -1,0 +1,28 @@
+FROM node:20-alpine
+
+WORKDIR /usr/src/app
+
+RUN corepack enable && corepack prepare pnpm@latest --activate
+
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml turbo.json ./
+
+COPY apps/http-backend ./apps/http-backend
+
+COPY packages/db ./packages/db
+COPY packages/backend-common ./packages/backend-common
+COPY packages/common ./packages/common
+COPY packages/typescript-config ./packages/typescript-config
+
+RUN pnpm install --frozen-lockfile
+
+RUN pnpm run db:generate
+
+RUN pnpm -F http-backend build
+
+# Environment variables
+ENV NODE_ENV=production
+ENV PORT=3001
+
+EXPOSE 3001
+
+CMD ["pnpm", "--dir", "apps/http-backend", "start"]

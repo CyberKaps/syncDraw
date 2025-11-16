@@ -1,0 +1,64 @@
+
+FROM node:20-alpine AS deps
+
+WORKDIR /usr/src/app
+
+RUN corepack enable && corepack prepare pnpm@latest --activate
+
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml turbo.json ./
+
+
+COPY apps/draw-app-fe ./apps/draw-app-fe
+
+COPY packages/ui ./packages/ui
+COPY packages/typescript-config ./packages/typescript-config
+COPY packages/eslint-config ./packages/eslint-config
+
+RUN pnpm install --frozen-lockfile
+
+FROM node:20-alpine AS builder
+
+WORKDIR /usr/src/app
+
+RUN corepack enable && corepack prepare pnpm@latest --activate
+
+COPY --from=deps /usr/src/app/node_modules ./node_modules
+COPY --from=deps /usr/src/app/apps/draw-app-fe/node_modules ./apps/draw-app-fe/node_modules
+COPY --from=deps /usr/src/app/packages ./packages
+
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml turbo.json ./
+COPY apps/draw-app-fe ./apps/draw-app-fe
+
+ARG NEXT_PUBLIC_HTTP_BACKEND_URL=http://localhost:3001
+ARG NEXT_PUBLIC_WS_BACKEND_URL=ws://localhost:8080
+
+ENV NEXT_PUBLIC_HTTP_BACKEND_URL=$NEXT_PUBLIC_HTTP_BACKEND_URL
+ENV NEXT_PUBLIC_WS_BACKEND_URL=$NEXT_PUBLIC_WS_BACKEND_URL
+
+RUN pnpm -F draw-app-fe build
+
+FROM node:20-alpine AS runner
+
+WORKDIR /usr/src/app
+
+RUN addgroup --system --gid 1001 nodejs
+RUN adduser --system --uid 1001 nextjs
+
+# Copy the entire standalone output (includes workspace node_modules)
+COPY --from=builder --chown=nextjs:nodejs /usr/src/app/apps/draw-app-fe/.next/standalone ./
+
+# Copy static files
+COPY --from=builder --chown=nextjs:nodejs /usr/src/app/apps/draw-app-fe/.next/static ./apps/draw-app-fe/.next/static
+
+# Copy public folder
+COPY --from=builder --chown=nextjs:nodejs /usr/src/app/apps/draw-app-fe/public ./apps/draw-app-fe/public
+
+USER nextjs
+
+ENV NODE_ENV=production
+ENV PORT=3000
+ENV HOSTNAME=0.0.0.0
+
+EXPOSE 3000
+
+CMD ["node", "apps/draw-app-fe/server.js"]
