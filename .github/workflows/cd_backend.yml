@@ -31,7 +31,7 @@ jobs:
           context: .
           file: ./docker/Dockerfile.backend
           push: true
-          tags: cyberkaps/sync-backend:{{ github.sha}}
+          tags: cyberkaps/sync-backend:${{ github.sha }},cyberkaps/sync-backend:latest
 
       # - name: SSH and deploy to VM
       #   uses: appleboy/ssh-action@v0.1.6
