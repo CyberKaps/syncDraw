@@ -79,6 +79,10 @@ jobs:
             # Run database migrations (wait for container to start)
             sleep 5
             docker exec sync-backend sh -c "cd packages/db && npx prisma migrate deploy"
+
+
+            # Reload Nginx to pick up changes (safe)
+            sudo systemctl reload nginx
             
             # Clean up old images
             docker image prune -f

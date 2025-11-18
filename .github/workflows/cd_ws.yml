@@ -69,6 +69,9 @@ jobs:
               -e NODE_ENV=production \
               --restart unless-stopped \
               cyberkaps/sync-ws:latest
+
+            # Reload Nginx to pick up changes (safe)
+            sudo systemctl reload nginx
             
             # Clean up old images
             docker image prune -f
