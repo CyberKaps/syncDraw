@@ -33,7 +33,7 @@ function App() {
             <div className="flex items-center gap-2">
               <Palette className="h-8 w-8 text-indigo-600" />
               <span className="text-2xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
-                Collab Canvas
+                syncDraw
               </span>
             </div>
             
