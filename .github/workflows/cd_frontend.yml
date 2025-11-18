@@ -55,6 +55,12 @@ jobs:
               -e NEXT_PUBLIC_WS_BACKEND_URL="ws://18.207.131.147:8080" \
               --restart unless-stopped \
               cyberkaps/sync-frontend:latest
+
+              
+
+            # Reload Nginx to pick up changes (safe)
+            sudo systemctl reload nginx
+
             
             # Clean up old images
             docker image prune -f
