@@ -36,14 +36,51 @@ jobs:
             DATABASE_URL=${{ secrets.DATABASE_URL }}
             JWT_SECRET=${{ secrets.JWT_SECRET }}
 
-      # - name: SSH and deploy to VM
-      #   uses: appleboy/ssh-action@v0.1.6
-      #   with:
-      #     host: ${{ secrets.VM_HOST }}
-      #     username: ${{ secrets.VM_USERNAME }}
-      #     key: ${{ secrets.VM_SSH_KEY }}
-      #     script: |
-      #       docker pull your-dockerhub-username/your-backend-image:latest
-      #       docker stop backend-container || true
-      #       docker rm backend-container || true
-      #       docker run -d --name backend-container -p 80:80 your-dockerhub-username/your-backend-image:latest
+      - name: Deploy to VM via SSH
+        run: |
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/ssh_key
+          chmod 600 ~/ssh_key
+          ssh -o StrictHostKeyChecking=no -i ~/ssh_key ubuntu@18.207.131.147 << 'EOF'
+            # Create Docker network if it doesn't exist
+            docker network create draw-app-network || true
+            
+            # Run PostgreSQL container if not running
+            if ! docker ps | grep -q postgres-db; then
+              docker run --name postgres-db -d \
+                --network draw-app-network \
+                -p 5432:5432 \
+                -e POSTGRES_PASSWORD=mysecretpassword \
+                -e POSTGRES_DB=syncdraw \
+                -v postgres_data:/var/lib/postgresql/data \
+                --restart unless-stopped \
+                postgres:16-alpine
+              
+              # Wait for PostgreSQL to be ready
+              sleep 10
+            fi
+            
+            # Pull latest backend image
+            docker pull cyberkaps/sync-backend:latest
+            
+            # Stop and remove old container if exists
+            docker stop sync-backend || true
+            docker rm sync-backend || true
+            
+            # Run new backend container with database connection
+            docker run --name sync-backend -d \
+              --network draw-app-network \
+              -p 3001:3001 \
+              -e DATABASE_URL="postgresql://postgres:mysecretpassword@postgres-db:5432/syncdraw?schema=public" \
+              -e JWT_SECRET="${{ secrets.JWT_SECRET }}" \
+              -e NODE_ENV=production \
+              --restart unless-stopped \
+              cyberkaps/sync-backend:latest
+            
+            # Run database migrations (wait for container to start)
+            sleep 5
+            docker exec sync-backend sh -c "cd packages/db && npx prisma migrate deploy"
+            
+            # Clean up old images
+            docker image prune -f
+          EOF
+          rm ~/ssh_key

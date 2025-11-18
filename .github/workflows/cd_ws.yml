@@ -32,3 +32,45 @@ jobs:
             DATABASE_URL=${{ secrets.DATABASE_URL }}
             JWT_SECRET=${{ secrets.JWT_SECRET }}
 
+      - name: Deploy to VM via SSH
+        run: |
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/ssh_key
+          chmod 600 ~/ssh_key
+          ssh -o StrictHostKeyChecking=no -i ~/ssh_key ubuntu@18.207.131.147 << 'EOF'
+            # Ensure Docker network exists
+            docker network create draw-app-network || true
+            
+            # Ensure PostgreSQL is running (should be started by backend deployment)
+            if ! docker ps | grep -q postgres-db; then
+              docker run --name postgres-db -d \
+                --network draw-app-network \
+                -p 5432:5432 \
+                -e POSTGRES_PASSWORD=mysecretpassword \
+                -e POSTGRES_DB=syncdraw \
+                -v postgres_data:/var/lib/postgresql/data \
+                --restart unless-stopped \
+                postgres:16-alpine
+              sleep 10
+            fi
+            
+            # Pull latest WebSocket image
+            docker pull cyberkaps/sync-ws:latest
+            
+            # Stop and remove old container if exists
+            docker stop sync-ws || true
+            docker rm sync-ws || true
+            
+            # Run new WebSocket container
+            docker run --name sync-ws -d \
+              --network draw-app-network \
+              -p 8080:8080 \
+              -e DATABASE_URL="postgresql://postgres:mysecretpassword@postgres-db:5432/syncdraw?schema=public" \
+              -e JWT_SECRET="${{ secrets.JWT_SECRET }}" \
+              -e NODE_ENV=production \
+              --restart unless-stopped \
+              cyberkaps/sync-ws:latest
+            
+            # Clean up old images
+            docker image prune -f
+          EOF
+          rm ~/ssh_key
