@@ -48,6 +48,8 @@ jobs:
             docker run --name sync-frontend -d \
               --network draw-app-network \
               -p 3000:3000 \
+              -e NEXT_PUBLIC_HTTP_BACKEND_URL="https://syncapi.cyberkaps.me" \
+              -e NEXT_PUBLIC_WS_BACKEND_URL="wss://syncws.cyberkaps.me" \
               --restart unless-stopped \
               cyberkaps/sync-frontend:latest
 
