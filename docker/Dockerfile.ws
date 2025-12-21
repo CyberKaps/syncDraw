@@ -14,7 +14,7 @@ COPY packages/typescript-config ./packages/typescript-config
 
 RUN pnpm install --frozen-lockfile
 
-RUN pnpm run db:generate
+RUN pnpm --filter @repo/db exec prisma generate
 
 RUN pnpm -F ws-backend build
 
