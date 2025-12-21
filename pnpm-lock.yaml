@@ -14,14 +14,14 @@ importers:
   .:
     dependencies:
       '@prisma/client':
-        specifier: 6.19.1
-        version: 6.19.1(prisma@6.19.1(typescript@5.8.2))(typescript@5.8.2)
+        specifier: 6.9.0
+        version: 6.9.0(prisma@6.19.1(typescript@5.8.2))(typescript@5.8.2)
     devDependencies:
       prettier:
         specifier: ^3.5.3
         version: 3.7.4
       prisma:
-        specifier: ^6.19.1
+        specifier: ^6.9.0
         version: 6.19.1(typescript@5.8.2)
       turbo:
         specifier: ^2.5.4
@@ -552,18 +552,6 @@ packages:
   '@nolyfill/is-core-module@1.0.39':
     resolution: {integrity: sha512-nn5ozdjYQpUCZlWGuxcJY/KpxkWQs4DcbMCmKojjyrYDEAGy4Ce19NN4v5MduafTwJlbKc99UA8YhSVqq9yPZA==}
     engines: {node: '>=12.4.0'}
-
-  '@prisma/client@6.19.1':
-    resolution: {integrity: sha512-4SXj4Oo6HyQkLUWT8Ke5R0PTAfVOKip5Roo+6+b2EDTkFg5be0FnBWiuRJc0BC0sRQIWGMLKW1XguhVfW/z3/A==}
-    engines: {node: '>=18.18'}
-    peerDependencies:
-      prisma: '*'
-      typescript: '>=5.1.0'
-    peerDependenciesMeta:
-      prisma:
-        optional: true
-      typescript:
-        optional: true
 
   '@prisma/client@6.9.0':
     resolution: {integrity: sha512-Gg7j1hwy3SgF1KHrh0PZsYvAaykeR0PaxusnLXydehS96voYCGt1U5zVR31NIouYc63hWzidcrir1a7AIyCsNQ==}
@@ -3398,11 +3386,6 @@ snapshots:
       fastq: 1.19.1
 
   '@nolyfill/is-core-module@1.0.39': {}
-
-  '@prisma/client@6.19.1(prisma@6.19.1(typescript@5.8.2))(typescript@5.8.2)':
-    optionalDependencies:
-      prisma: 6.19.1(typescript@5.8.2)
-      typescript: 5.8.2
 
   '@prisma/client@6.9.0(prisma@6.19.1(typescript@5.8.2))(typescript@5.8.2)':
     optionalDependencies:

@@ -11,7 +11,7 @@
   },
   "devDependencies": {
     "prettier": "^3.5.3",
-    "prisma": "^6.19.1",
+    "prisma": "^6.9.0",
     "turbo": "^2.5.4",
     "typescript": "5.8.2"
   },
@@ -27,6 +27,6 @@
     "node": ">=18"
   },
   "dependencies": {
-    "@prisma/client": "6.19.1"
+    "@prisma/client": "6.9.0"
   }
 }
