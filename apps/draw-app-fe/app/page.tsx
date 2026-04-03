@@ -33,7 +33,7 @@ function App() {
             <div className="flex items-center gap-2">
               <Palette className="h-8 w-8 text-indigo-600" />
               <span className="text-2xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
-                Collab Canvas
+                syncDraw
               </span>
             </div>
             
@@ -306,7 +306,7 @@ function App() {
               </div>
               <h3 className="text-xl font-semibold text-gray-900 mb-3">Start Drawing</h3>
               <p className="text-gray-600">
-                Collaborate in real-time with your team. It's that simple!
+                Collaborate in real-time with your team. It&apos;s that simple!
               </p>
             </div>
           </div>

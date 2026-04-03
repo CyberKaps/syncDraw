@@ -1,14 +1,16 @@
 import { RoomCanvas } from "@/components/RoomCanvas";
 
-export default async function CanvasPage({ params }: {
-    params: {
-        roomId: string
-    }
-}) {
+// Force dynamic rendering - don't pre-generate this page at build time
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
-    const roomId = (await params).roomId;
+export default async function CanvasPage({ 
+    params 
+}: {
+    params: Promise<{ roomId: string }>
+}) {
+    const { roomId } = await params;
     console.log(roomId);
 
     return <RoomCanvas roomId={roomId} />
-    
 }

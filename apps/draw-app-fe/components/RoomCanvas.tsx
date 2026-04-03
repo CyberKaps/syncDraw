@@ -73,6 +73,7 @@ export function RoomCanvas({roomId}: {
 
         return () => {
             clearTimeout(initTimeout);
+            // eslint-disable-next-line react-hooks/exhaustive-deps
             clearTimeout(reconnectTimeoutRef.current);
             
             // Clean close the WebSocket
@@ -91,7 +92,8 @@ export function RoomCanvas({roomId}: {
                 wsRef.current = null;
             }
         }
-
+        // error is intentionally excluded from deps to avoid infinite loops
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [roomId, router])
 
 

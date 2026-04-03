@@ -1,0 +1,69 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_PASSWORD: mysecretpassword
+      POSTGRES_DB: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - draw-app-network
+
+  http-backend:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.backend
+    ports:
+      - "3001:3001"
+    environment:
+      - DATABASE_URL=postgresql://postgres:mysecretpassword@postgres:5432/postgres?schema=public
+      - JWT_SECRET=${JWT_SECRET:-your-secret-key-here}
+      - NODE_ENV=production
+    depends_on:
+      - postgres
+    networks:
+      - draw-app-network
+
+  ws-backend:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.ws
+    ports:
+      - "8080:8080"
+    environment:
+      - DATABASE_URL=postgresql://postgres:mysecretpassword@postgres:5432/postgres?schema=public
+      - JWT_SECRET=${JWT_SECRET:-your-secret-key-here}
+      - NODE_ENV=production
+    depends_on:
+      - postgres
+    networks:
+      - draw-app-network
+
+  frontend:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.frontend
+      args:
+        - NEXT_PUBLIC_HTTP_BACKEND_URL=${NEXT_PUBLIC_HTTP_BACKEND_URL:-http://localhost:3001}
+        - NEXT_PUBLIC_WS_BACKEND_URL=${NEXT_PUBLIC_WS_BACKEND_URL:-ws://localhost:8080}
+    ports:
+      - "3000:3000"
+    environment:
+      - NEXT_PUBLIC_HTTP_BACKEND_URL=${NEXT_PUBLIC_HTTP_BACKEND_URL:-http://localhost:3001}
+      - NEXT_PUBLIC_WS_BACKEND_URL=${NEXT_PUBLIC_WS_BACKEND_URL:-ws://localhost:8080}
+    depends_on:
+      - http-backend
+      - ws-backend
+    networks:
+      - draw-app-network
+
+volumes:
+  postgres_data:
+
+networks:
+  draw-app-network:
+    driver: bridge

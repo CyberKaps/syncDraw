@@ -1,0 +1,34 @@
+FROM node:20-alpine
+
+WORKDIR /usr/src/app
+
+RUN corepack enable && corepack prepare pnpm@latest --activate
+
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml turbo.json ./
+
+COPY apps/http-backend ./apps/http-backend
+
+COPY packages/db ./packages/db
+COPY packages/backend-common ./packages/backend-common
+COPY packages/common ./packages/common
+COPY packages/typescript-config ./packages/typescript-config
+
+RUN pnpm install --frozen-lockfile
+
+RUN pnpm --filter @repo/db exec prisma generate
+
+RUN pnpm -F http-backend build
+
+# Build arguments
+ARG DATABASE_URL
+ARG JWT_SECRET
+
+# Environment variables
+ENV NODE_ENV=production
+ENV PORT=3001
+ENV DATABASE_URL=$DATABASE_URL
+ENV JWT_SECRET=$JWT_SECRET
+
+EXPOSE 3001
+
+CMD ["pnpm", "--dir", "apps/http-backend", "start"]

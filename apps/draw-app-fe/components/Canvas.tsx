@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from "react";
-import { IconButton } from "./IconButton";
 import { Circle, Pencil, RectangleHorizontalIcon, ArrowUpRight, Diamond, Minus, Type, MousePointer2, Home, Eraser, ZoomIn, ZoomOut, Maximize2, Trash2 } from "lucide-react";
 import { Game } from "@/draw/Game";
 import { useRouter } from "next/navigation";
@@ -48,6 +47,7 @@ export function Canvas({
                 g.destroy();
             }
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [canvasRef]);
 
     const handleGoHome = () => {

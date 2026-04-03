@@ -27,7 +27,7 @@ export function CreateRoom() {
     }
 
     try {
-      const payload: any = { name: roomName };
+      const payload: { name: string; password?: string } = { name: roomName };
       if (usePassword && password) {
         payload.password = password;
       }
@@ -48,8 +48,8 @@ export function CreateRoom() {
       } else {
         throw new Error("Failed to create room");
       }
-    } catch (err: any) {
-      const message = err.response?.data?.error || "Failed to create room";
+    } catch (err) {
+      const message = (err as { response?: { data?: { error?: string } } }).response?.data?.error || "Failed to create room";
       setError(message);
     } finally {
       setLoading(false);

@@ -34,7 +34,7 @@ export function Dashboard() {
       });
 
       setRooms(response.data.rooms);
-    } catch (err) {
+    } catch {
       setError("Failed to load rooms");
     } finally {
       setLoading(false);
@@ -56,8 +56,8 @@ export function Dashboard() {
 
       // Refresh the rooms list
       fetchRooms();
-    } catch (err: any) {
-      alert(err.response?.data?.error || "Failed to delete room");
+    } catch (err) {
+      alert((err as { response?: { data?: { error?: string } } }).response?.data?.error || "Failed to delete room");
     }
   };
 

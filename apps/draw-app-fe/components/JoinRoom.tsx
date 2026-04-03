@@ -34,13 +34,14 @@ export function JoinRoom() {
       if (verifyResponse.data.success) {
         router.push(`/canvas/${roomSlug}`);
       }
-    } catch (err: any) {
-      const errorMessage = err.response?.data?.error;
+    } catch (err) {
+      const errorResponse = err as { response?: { data?: { error?: string }; status?: number } };
+      const errorMessage = errorResponse.response?.data?.error;
       
       if (errorMessage === "Incorrect password") {
         setError("Incorrect password");
         setShowPasswordField(true);
-      } else if (err.response?.status === 403 && !showPasswordField) {
+      } else if (errorResponse.response?.status === 403 && !showPasswordField) {
         // Room requires password
         setShowPasswordField(true);
         setError("This room requires a password");
