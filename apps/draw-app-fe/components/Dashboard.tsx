@@ -68,7 +68,7 @@ export function Dashboard() {
   if (loading) {
     return (
       <div className="text-center py-8">
-        <p className="text-gray-600">Loading your rooms...</p>
+        <p className="text-zinc-400">Loading your rooms...</p>
       </div>
     );
   }
@@ -76,45 +76,45 @@ export function Dashboard() {
   if (error) {
     return (
       <div className="text-center py-8">
-        <p className="text-red-600">{error}</p>
+        <p className="text-red-400">{error}</p>
       </div>
     );
   }
 
   if (rooms.length === 0) {
     return (
-      <div className="text-center py-12 bg-gray-50 rounded-2xl border-2 border-dashed border-gray-300">
-        <p className="text-gray-600 text-lg mb-2">No rooms yet</p>
-        <p className="text-gray-500 text-sm">Create your first room to get started</p>
+      <div className="text-center py-12 bg-zinc-900/50 rounded-2xl border-2 border-dashed border-white/10">
+        <p className="text-zinc-300 text-lg mb-2">No rooms yet</p>
+        <p className="text-zinc-500 text-sm">Create your first room to get started</p>
       </div>
     );
   }
 
   return (
     <div className="space-y-4">
-      <h3 className="text-xl font-semibold text-gray-900 mb-4">Your Rooms</h3>
+      <h3 className="text-xl font-semibold text-white mb-4">Your Rooms</h3>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {rooms.map((room) => (
           <div
             key={room.id}
-            className="bg-white border border-gray-200 rounded-xl p-6 hover:shadow-lg transition-all group"
+            className="bg-zinc-800/50 border border-white/5 rounded-xl p-6 hover:shadow-lg hover:border-white/20 transition-all group"
           >
             <div className="flex items-start justify-between mb-4">
               <div className="flex-1">
-                <h4 className="text-lg font-semibold text-gray-900 mb-1 flex items-center gap-2">
+                <h4 className="text-lg font-semibold text-white mb-1 flex items-center gap-2">
                   {room.slug}
                   {room.password && (
-                    <Lock className="h-4 w-4 text-gray-500" />
+                    <Lock className="h-4 w-4 text-zinc-500" />
                   )}
                 </h4>
-                <p className="text-sm text-gray-500 flex items-center gap-1">
+                <p className="text-sm text-zinc-400 flex items-center gap-1">
                   <Calendar className="h-3 w-3" />
                   {new Date(room.createdAt).toLocaleDateString()}
                 </p>
               </div>
               <button
                 onClick={() => deleteRoom(room.slug)}
-                className="text-gray-400 hover:text-red-600 transition-colors opacity-0 group-hover:opacity-100"
+                className="text-zinc-500 hover:text-red-400 transition-colors opacity-0 group-hover:opacity-100"
               >
                 <Trash2 className="h-5 w-5" />
               </button>

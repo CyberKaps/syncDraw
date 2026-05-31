@@ -57,23 +57,23 @@ export function CreateRoom() {
   };
 
   return (
-    <div className="p-10 m-2 bg-white rounded-2xl border border-gray-200 shadow-2xl w-[450px]">
-      <h1 className="text-black text-3xl text-center font-bold mb-2">
+    <div className="p-10 m-2 bg-zinc-900 rounded-2xl border border-white/10 shadow-2xl w-[450px]">
+      <h1 className="text-white text-3xl text-center font-bold mb-2">
         Create a Room
       </h1>
-      <p className="text-gray-500 text-center mb-6 text-sm">
+      <p className="text-zinc-400 text-center mb-6 text-sm">
         Start a new collaborative whiteboard session
       </p>
 
       <div className="mb-4">
-        <label className="block text-sm font-medium text-gray-700 mb-2">
+        <label className="block text-sm font-medium text-zinc-300 mb-2">
           Room Name
         </label>
         <Input
           type="text"
           placeholder="e.g., Team Brainstorm"
           onChange={(e) => setRoomName(e.target.value)}
-          className="w-full"
+          className="w-full bg-zinc-800 border-zinc-700 text-white placeholder:text-zinc-500"
         />
       </div>
 
@@ -83,9 +83,9 @@ export function CreateRoom() {
             type="checkbox"
             checked={usePassword}
             onChange={(e) => setUsePassword(e.target.checked)}
-            className="w-4 h-4 text-indigo-600 rounded focus:ring-indigo-500"
+            className="w-4 h-4 text-indigo-600 rounded bg-zinc-800 border-zinc-700 focus:ring-indigo-500"
           />
-          <span className="text-sm font-medium text-gray-700">
+          <span className="text-sm font-medium text-zinc-300">
             Protect with password (optional)
           </span>
         </label>
@@ -93,21 +93,21 @@ export function CreateRoom() {
 
       {usePassword && (
         <div className="mb-4">
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-medium text-zinc-300 mb-2">
             Password
           </label>
           <Input
             type="password"
             placeholder="Enter room password"
             onChange={(e) => setPassword(e.target.value)}
-            className="w-full"
+            className="w-full bg-zinc-800 border-zinc-700 text-white placeholder:text-zinc-500"
           />
         </div>
       )}
 
       {error && (
-        <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
-          <p className="text-red-600 text-sm text-center">{error}</p>
+        <div className="mb-4 p-3 bg-red-900/50 border border-red-500/50 rounded-lg">
+          <p className="text-red-400 text-sm text-center">{error}</p>
         </div>
       )}
 

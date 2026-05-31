@@ -55,13 +55,20 @@ export function AuthPage({ isSignin }: { isSignin: boolean }) {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-50 via-white to-purple-50 px-4">
-      <div className="p-10 bg-white rounded-2xl border border-gray-200 shadow-2xl w-full max-w-md">
+    <div className="min-h-screen flex items-center justify-center bg-[#030303] px-4 relative overflow-hidden">
+      {/* Dynamic Background identical to page.tsx */}
+      <div className="absolute inset-0 z-0 flex items-center justify-center overflow-hidden pointer-events-none">
+        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-indigo-600/20 blur-[120px] mix-blend-screen" />
+        <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full bg-purple-600/20 blur-[120px] mix-blend-screen" />
+        <div className="absolute top-[40%] left-[30%] w-[30%] h-[30%] rounded-full bg-blue-500/10 blur-[100px] mix-blend-screen animate-pulse" />
+      </div>
+
+      <div className="p-10 bg-zinc-900/50 backdrop-blur-md rounded-2xl border border-white/10 shadow-2xl w-full max-w-md relative z-10">
         <div className="text-center mb-8">
-          <h1 className="text-black text-3xl font-bold mb-2">
+          <h1 className="text-white text-3xl font-bold mb-2">
             {isSignin ? "Welcome Back" : "Create Account"}
           </h1>
-          <p className="text-gray-500 text-sm">
+          <p className="text-zinc-400 text-sm">
             {isSignin 
               ? "Sign in to continue to SyncDraw" 
               : "Get started with your free account"}
@@ -70,45 +77,45 @@ export function AuthPage({ isSignin }: { isSignin: boolean }) {
 
         {!isSignin && (
           <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-zinc-300 mb-2">
               Full Name
             </label>
             <Input
               type="text"
               placeholder="John Doe"
               onChange={(e) => setName(e.target.value)}
-              className="w-full"
+              className="w-full bg-zinc-800 border-zinc-700 text-white placeholder:text-zinc-500"
             />
           </div>
         )}
 
         <div className="mb-4">
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-medium text-zinc-300 mb-2">
             Email Address
           </label>
           <Input
             type="text"
             placeholder="you@example.com"
             onChange={(e) => setEmail(e.target.value)}
-            className="w-full"
+            className="w-full bg-zinc-800 border-zinc-700 text-white placeholder:text-zinc-500"
           />
         </div>
 
         <div className="mb-6">
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-medium text-zinc-300 mb-2">
             Password
           </label>
           <Input
             type="password"
             placeholder="Enter your password"
             onChange={(e) => setPassword(e.target.value)}
-            className="w-full"
+            className="w-full bg-zinc-800 border-zinc-700 text-white placeholder:text-zinc-500"
           />
         </div>
 
         {error && (
-          <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
-            <p className="text-red-600 text-sm text-center">{error}</p>
+          <div className="mb-4 p-3 bg-red-900/50 border border-red-500/50 rounded-lg">
+            <p className="text-red-400 text-sm text-center">{error}</p>
           </div>
         )}
 
@@ -119,10 +126,10 @@ export function AuthPage({ isSignin }: { isSignin: boolean }) {
           {loading ? "Loading..." : isSignin ? "Sign In" : "Create Account"}
         </Button>
 
-        <div className="text-center">
+        <div className="text-center mt-6">
           <Link 
             href={isSignin ? "/signup" : "/signin"}
-            className="text-sm text-indigo-600 hover:text-indigo-700 font-medium"
+            className="text-sm text-indigo-400 hover:text-indigo-300 font-medium"
           >
             {isSignin
               ? "Don't have an account? Sign up"

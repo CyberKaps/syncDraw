@@ -10,10 +10,12 @@
     "dev": "npm run build && npm run start"
   },
   "dependencies": {
+    "@google/genai": "^2.7.0",
     "@repo/db": "workspace:*",
     "@types/cors": "^2.8.19",
     "@types/jsonwebtoken": "^9.0.9",
     "cors": "^2.8.5",
+    "dotenv": "^17.4.2",
     "express": "^5.1.0",
     "jsonwebtoken": "^9.0.2"
   },

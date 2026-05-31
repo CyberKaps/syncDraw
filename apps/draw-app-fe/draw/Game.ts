@@ -33,7 +33,7 @@ export class Game {
   private currentPath: Array<{ x: number; y: number }> = [];
   private startX = 0;
   private startY = 0;
-  private selectedTool: Tool = "circle";
+  private selectedTool: Tool = "select";
   private activeTextInput: HTMLInputElement | null = null;
 
   // Selection/drag state
@@ -92,10 +92,7 @@ export class Game {
 
   setTool(tool: Tool) {
     this.selectedTool = tool;
-    if (this.activeTextInput) {
-      document.body.removeChild(this.activeTextInput);
-      this.activeTextInput = null;
-    }
+    this.cleanupTextInput();
     this.draggingShape = null;
     this.draggingMode = null;
     this.resizeHandleIndex = null;
@@ -143,6 +140,27 @@ export class Game {
     this.existingShapes = [];
     this.clearCanvas();
     this.wsHandler.sendClearAll();
+  }
+
+  addShapesBulk(shapes: Shape[]) {
+    // Process shapes to ensure they have IDs
+    const newShapes = shapes.map(s => {
+      if (!(s as any).id) {
+        (s as any).id = this.shapeManager.genId();
+      }
+      return s;
+    });
+
+    // Add to local state
+    this.existingShapes.push(...newShapes);
+    
+    // Broadcast each shape to other clients (and save to DB)
+    newShapes.forEach(shape => {
+      this.wsHandler.sendShapeUpdate(shape, "chat");
+    });
+    
+    // Auto zoom out to see the generated diagram if needed, or just clear canvas to render them
+    this.clearCanvas();
   }
 
   // ==================== WebSocket Handlers ====================
@@ -379,6 +397,20 @@ export class Game {
 
   // ==================== Helper Methods ====================
 
+  private cleanupTextInput() {
+    if (this.activeTextInput) {
+      const input = this.activeTextInput;
+      this.activeTextInput = null;
+      try {
+        if (input.parentNode) {
+          input.remove();
+        }
+      } catch (e) {
+        // Ignore DOM race condition errors during blur/click
+      }
+    }
+  }
+
   private handleTextToolClick(x: number, y: number) {
     if (this.activeTextInput) {
       // Just finish the current one if it exists
@@ -386,8 +418,7 @@ export class Game {
       if (text) {
         this.activeTextInput.dispatchEvent(new KeyboardEvent('keydown', {'key': 'Enter'}));
       } else {
-        document.body.removeChild(this.activeTextInput);
-        this.activeTextInput = null;
+        this.cleanupTextInput();
       }
     }
 
@@ -443,24 +474,16 @@ export class Game {
 
           this.clearCanvas();
         }
-        if (input.parentNode) {
-          document.body.removeChild(input);
-        }
-        this.activeTextInput = null;
+        this.cleanupTextInput();
       } else if (ev.key === "Escape") {
-        if (input.parentNode) {
-          document.body.removeChild(input);
-        }
-        this.activeTextInput = null;
+        this.cleanupTextInput();
       }
     });
 
-    // Also close on blur if empty
     input.addEventListener("blur", () => {
       const text = input.value.trim();
-      if (!text && input.parentNode) {
-        document.body.removeChild(input);
-        this.activeTextInput = null;
+      if (!text) {
+        this.cleanupTextInput();
       }
     });
   }

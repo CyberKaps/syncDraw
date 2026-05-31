@@ -32,6 +32,9 @@ export function JoinRoom() {
       });
 
       if (verifyResponse.data.success) {
+        if (password) {
+          sessionStorage.setItem(`room_password_${roomSlug}`, password);
+        }
         router.push(`/canvas/${roomSlug}`);
       }
     } catch (err) {
@@ -54,16 +57,16 @@ export function JoinRoom() {
   };
 
   return (
-    <div className="p-10 m-2 bg-white rounded-2xl border border-gray-200 shadow-2xl w-[450px]">
-      <h1 className="text-black text-3xl text-center font-bold mb-2">
+    <div className="p-10 m-2 bg-zinc-900 rounded-2xl border border-white/10 shadow-2xl w-[450px]">
+      <h1 className="text-white text-3xl text-center font-bold mb-2">
         Join a Room
       </h1>
-      <p className="text-gray-500 text-center mb-6 text-sm">
+      <p className="text-zinc-400 text-center mb-6 text-sm">
         Enter the room name to join the session
       </p>
 
       <div className="mb-4">
-        <label className="block text-sm font-medium text-gray-700 mb-2">
+        <label className="block text-sm font-medium text-zinc-300 mb-2">
           Room Name
         </label>
         <Input
@@ -75,13 +78,13 @@ export function JoinRoom() {
               handleJoinRoom();
             }
           }}
-          className="w-full"
+          className="w-full bg-zinc-800 border-zinc-700 text-white placeholder:text-zinc-500"
         />
       </div>
 
       {showPasswordField && (
         <div className="mb-4">
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-medium text-zinc-300 mb-2">
             Password
           </label>
           <Input
@@ -93,14 +96,14 @@ export function JoinRoom() {
                 handleJoinRoom();
               }
             }}
-            className="w-full"
+            className="w-full bg-zinc-800 border-zinc-700 text-white placeholder:text-zinc-500"
           />
         </div>
       )}
 
       {error && (
-        <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
-          <p className="text-red-600 text-sm text-center">{error}</p>
+        <div className="mb-4 p-3 bg-red-900/50 border border-red-500/50 rounded-lg">
+          <p className="text-red-400 text-sm text-center">{error}</p>
         </div>
       )}
 

@@ -1,3 +1,5 @@
+import dotenv from "dotenv";
+dotenv.config({ path: "../../.env" });
 import { WebSocketServer } from 'ws';
 import jwt, { JwtPayload } from 'jsonwebtoken';
 import { JWT_SECRET } from "@repo/backend-common/config";
@@ -9,7 +11,7 @@ const wss = new WebSocketServer({ port: 8080 });
 interface User {
     ws: WebSocket,
     rooms: string[],
-    userId: string
+    userId: string | null
 }
 
 const users: User[] = [];
@@ -42,13 +44,10 @@ wss.on('connection', function connection(ws, request) {
         return;
     }
     const queryParams = new URLSearchParams(url.split('?')[1]);
-    const token = queryParams.get('token') || "";
+    const token = queryParams.get('token');
     
-    const userId = (checkUser(token));
-    if(userId == null) {
-        ws.close();
-        return null;
-    }
+    // Check user token if provided, otherwise default to null (anonymous guest)
+    const userId = token ? checkUser(token) : null;
 
     users.push({
         userId,
@@ -61,8 +60,25 @@ wss.on('connection', function connection(ws, request) {
         console.log('Received message type:', parsedData.type); // Debug log
 
         if (parsedData.type == "join_room") {
+            const room = await prismaClient.room.findUnique({
+                where: { slug: parsedData.roomId }
+            });
+
+            if (!room) {
+                ws.send(JSON.stringify({ type: "error", code: "ROOM_NOT_FOUND", message: "Room does not exist" }));
+                return;
+            }
+
+            if (room.password && room.password !== parsedData.password) {
+                ws.send(JSON.stringify({ type: "error", code: "PASSWORD_REQUIRED", message: "Incorrect or missing password" }));
+                return;
+            }
+
             const user = users.find(x => x.ws === ws);
-            user?.rooms.push(parsedData.roomId);
+            if (user) {
+                user.rooms.push(parsedData.roomId);
+                ws.send(JSON.stringify({ type: "join_room_success", roomId: parsedData.roomId }));
+            }
         }
 
         if (parsedData.type == "leave_room") {
@@ -95,7 +111,7 @@ wss.on('connection', function connection(ws, request) {
                 data: {
                     roomId: room.id,
                     message,
-                    userId
+                    userId: userId || undefined
                 }
             });
             

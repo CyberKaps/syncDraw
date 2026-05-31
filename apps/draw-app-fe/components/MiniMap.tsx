@@ -23,7 +23,7 @@ export function MiniMap({
     onNavigate 
 }: MiniMapProps) {
     const miniMapRef = useRef<HTMLCanvasElement>(null);
-    const miniMapSize = 200;
+    const miniMapSize = 150;
     const scale = 0.1; // Mini map is 10% of actual canvas
 
     useEffect(() => {
@@ -81,17 +81,17 @@ export function MiniMap({
     };
 
     return (
-        <div className="fixed bottom-6 left-6 z-50 pointer-events-none animate-fade-in-up animation-delay-300">
+        <div className="fixed bottom-4 left-4 z-50 pointer-events-none animate-fade-in-up animation-delay-300">
             <div className="relative pointer-events-auto group">
                 {/* Title */}
-                <div className="absolute -top-8 left-0 right-0 text-center transition-transform group-hover:-translate-y-1">
-                    <div className="bg-zinc-900/80 backdrop-blur-xl text-zinc-300 text-xs px-4 py-1.5 rounded-t-xl shadow-lg border border-white/10 border-b-0 inline-block font-medium tracking-wide">
+                <div className="absolute -top-7 left-0 right-0 text-center transition-transform group-hover:-translate-y-1">
+                    <div className="bg-zinc-900/80 backdrop-blur-xl text-zinc-300 text-[10px] px-3 py-1 rounded-t-lg shadow-lg border border-white/10 border-b-0 inline-block font-medium tracking-wide">
                         Overview
                     </div>
                 </div>
                 
                 {/* MiniMap Canvas */}
-                <div className="bg-zinc-900/70 backdrop-blur-xl rounded-2xl shadow-2xl border border-white/10 overflow-hidden hover:border-indigo-500/50 transition-all duration-300 hover:shadow-[0_0_20px_-5px_rgba(99,102,241,0.3)]">
+                <div className="bg-zinc-900/70 backdrop-blur-xl rounded-xl shadow-2xl border border-white/10 overflow-hidden hover:border-indigo-500/50 transition-all duration-300 hover:shadow-[0_0_20px_-5px_rgba(99,102,241,0.3)]">
                     <canvas
                         ref={miniMapRef}
                         width={miniMapSize}

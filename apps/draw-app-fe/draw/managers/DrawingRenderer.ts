@@ -49,16 +49,19 @@ export class DrawingRenderer {
    * Draw a single shape on the canvas
    */
   drawShape(shape: Shape) {
+    // Log the shape so we can debug what the AI actually returned
+    console.log("Drawing shape:", shape);
+
     if (shape.type === "rect") {
-      this.ctx.strokeRect(shape.x, shape.y, shape.width, shape.height);
+      this.ctx.strokeRect(shape.x || 0, shape.y || 0, shape.width || 150, shape.height || 80);
     } else if (shape.type === "circle") {
       this.ctx.beginPath();
-      this.ctx.arc(shape.centerX, shape.centerY, Math.abs(shape.radius), 0, Math.PI * 2);
+      this.ctx.arc((shape as any).centerX || 0, (shape as any).centerY || 0, Math.abs((shape as any).radius || 50), 0, Math.PI * 2);
       this.ctx.stroke();
       this.ctx.closePath();
     } else if (shape.type === "pencil") {
       this.ctx.beginPath();
-      const points = shape.points;
+      const points = shape.points || [];
       if (points.length > 0) {
         this.ctx.moveTo(points[0].x, points[0].y);
         for (let i = 1; i < points.length; i++) this.ctx.lineTo(points[i].x, points[i].y);
@@ -67,47 +70,60 @@ export class DrawingRenderer {
       this.ctx.closePath();
     } else if (shape.type === "line") {
       this.ctx.beginPath();
-      this.ctx.moveTo(shape.startX, shape.startY);
-      this.ctx.lineTo(shape.endX, shape.endY);
+      this.ctx.moveTo(shape.startX || 0, shape.startY || 0);
+      this.ctx.lineTo(shape.endX || 0, shape.endY || 0);
       this.ctx.stroke();
       this.ctx.closePath();
     } else if (shape.type === "arrow") {
+      const startX = shape.startX || 0;
+      const startY = shape.startY || 0;
+      const endX = shape.endX || 0;
+      const endY = shape.endY || 0;
+      
       this.ctx.beginPath();
-      this.ctx.moveTo(shape.startX, shape.startY);
-      this.ctx.lineTo(shape.endX, shape.endY);
+      this.ctx.moveTo(startX, startY);
+      this.ctx.lineTo(endX, endY);
       this.ctx.stroke();
       this.ctx.closePath();
 
-      const angle = Math.atan2(shape.endY - shape.startY, shape.endX - shape.startX);
+      const angle = Math.atan2(endY - startY, endX - startX);
       const headLen = 10;
       this.ctx.beginPath();
-      this.ctx.moveTo(shape.endX, shape.endY);
+      this.ctx.moveTo(endX, endY);
       this.ctx.lineTo(
-        shape.endX - headLen * Math.cos(angle - Math.PI / 6),
-        shape.endY - headLen * Math.sin(angle - Math.PI / 6)
+        endX - headLen * Math.cos(angle - Math.PI / 6),
+        endY - headLen * Math.sin(angle - Math.PI / 6)
       );
-      this.ctx.moveTo(shape.endX, shape.endY);
+      this.ctx.moveTo(endX, endY);
       this.ctx.lineTo(
-        shape.endX - headLen * Math.cos(angle + Math.PI / 6),
-        shape.endY - headLen * Math.sin(angle + Math.PI / 6)
+        endX - headLen * Math.cos(angle + Math.PI / 6),
+        endY - headLen * Math.sin(angle + Math.PI / 6)
       );
       this.ctx.stroke();
       this.ctx.closePath();
     } else if (shape.type === "diamond") {
-      const cx = shape.x + shape.width / 2;
-      const cy = shape.y + shape.height / 2;
+      const x = shape.x || 0;
+      const y = shape.y || 0;
+      const width = shape.width || 100;
+      const height = shape.height || 100;
+      
+      const cx = x + width / 2;
+      const cy = y + height / 2;
       this.ctx.beginPath();
-      this.ctx.moveTo(cx, shape.y);
-      this.ctx.lineTo(shape.x + shape.width, cy);
-      this.ctx.lineTo(cx, shape.y + shape.height);
-      this.ctx.lineTo(shape.x, cy);
+      this.ctx.moveTo(cx, y);
+      this.ctx.lineTo(x + width, cy);
+      this.ctx.lineTo(cx, y + height);
+      this.ctx.lineTo(x, cy);
       this.ctx.closePath();
       this.ctx.stroke();
     } else if (shape.type === "text") {
       const fontSize = (shape as any).fontSize || 24;
       this.ctx.font = `${fontSize}px sans-serif`;
       this.ctx.textBaseline = "top";
-      this.ctx.fillText(shape.content, shape.x, shape.y);
+      
+      // Fallbacks in case AI used 'text', 'label', or 'name' instead of 'content'
+      const content = shape.content || (shape as any).text || (shape as any).label || (shape as any).name || "Unknown";
+      this.ctx.fillText(content, shape.x || 0, shape.y || 0);
     }
   }
 

@@ -2,7 +2,7 @@
 
 import { Button } from "@repo/ui/button";
 import { Card } from "@repo/ui/card";
-import { Pencil, Share2, Users2, Sparkles, Github, Palette, Video, Zap, ArrowRight, Layers, MousePointer2 } from "lucide-react";
+import { Pencil, Share2, Users2, Sparkles, Github, Palette, Video, Zap, ArrowRight, Layers, MousePointer2, PlusCircle, Link2 } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { CreateRoom } from "@/components/CreateRoom";
@@ -45,9 +45,6 @@ function App() {
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl shadow-lg shadow-indigo-500/20">
-                <Palette className="h-6 w-6 text-white" />
-              </div>
               <span className="text-2xl font-bold bg-gradient-to-r from-white to-zinc-400 bg-clip-text text-transparent tracking-tight">
                 syncDraw
               </span>
@@ -60,6 +57,11 @@ function App() {
               <a href="#how-it-works" className="text-sm font-medium text-zinc-400 hover:text-white transition-colors">
                 How it works
               </a>
+              {isLoggedIn && (
+                <a href="#workspace" className="text-sm font-medium text-zinc-400 hover:text-white transition-colors">
+                  My Workspace
+                </a>
+              )}
             </div>
 
             <div className="flex items-center gap-4">
@@ -140,10 +142,10 @@ function App() {
         {/* Hero Section */}
         <section className="relative pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative text-center">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 text-indigo-300 text-sm font-medium mb-8 backdrop-blur-sm animate-fade-in-up">
+            {/* <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 text-indigo-300 text-sm font-medium mb-8 backdrop-blur-sm animate-fade-in-up">
               <Sparkles className="h-4 w-4" />
               <span>Next-Gen Collaborative Whiteboard</span>
-            </div>
+            </div> */}
             
             <h1 className="text-5xl md:text-7xl lg:text-8xl font-extrabold tracking-tighter text-white mb-8 animate-fade-in-up animation-delay-100">
               Draw Together,
@@ -209,7 +211,7 @@ function App() {
 
         {/* Dashboard Section */}
         {isLoggedIn && (
-          <section className="py-20 bg-zinc-900/30 border-y border-white/5 relative overflow-hidden">
+          <section id="workspace" className="py-20 bg-zinc-900/30 border-y border-white/5 relative overflow-hidden">
             <div className="absolute inset-0 bg-gradient-to-b from-black/0 via-indigo-900/5 to-black/0"></div>
             <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
               <div className="mb-12 flex items-center justify-between">
@@ -221,6 +223,58 @@ function App() {
             </div>
           </section>
         )}
+
+        {/* How It Works Section */}
+        <section id="how-it-works" className="py-32 relative">
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center mb-20">
+              <h2 className="text-4xl md:text-5xl font-bold text-white mb-6 tracking-tight">
+                How <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-400">syncDraw</span> Works
+              </h2>
+              <p className="text-xl text-zinc-400 max-w-2xl mx-auto">
+                Get started in seconds. No complex onboarding, just pure creativity.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-12 relative">
+              {/* Connecting line for desktop */}
+              <div className="hidden md:block absolute top-12 left-[16%] right-[16%] h-0.5 bg-gradient-to-r from-indigo-500/0 via-indigo-500/20 to-purple-500/0"></div>
+              
+              {[
+                {
+                  step: "01",
+                  title: "Create a Room",
+                  desc: "Start a fresh canvas instantly. Secure it with a password if you want to keep things private.",
+                  icon: <PlusCircle className="h-8 w-8 text-indigo-400" />
+                },
+                {
+                  step: "02",
+                  title: "Share the Link",
+                  desc: "Send the room link to your team. They can join instantly from any device, no install required.",
+                  icon: <Link2 className="h-8 w-8 text-purple-400" />
+                },
+                {
+                  step: "03",
+                  title: "Draw Together",
+                  desc: "See everyone's cursors in real-time as you sketch, mind-map, and build ideas as a team.",
+                  icon: <Sparkles className="h-8 w-8 text-pink-400" />
+                }
+              ].map((item, i) => (
+                <div key={i} className="relative flex flex-col items-center text-center group">
+                  <div className="w-24 h-24 rounded-full bg-zinc-900/80 border border-white/10 flex items-center justify-center mb-8 relative z-10 shadow-xl backdrop-blur-sm group-hover:border-indigo-500/50 group-hover:scale-110 transition-all duration-300">
+                    <div className="absolute inset-0 rounded-full bg-gradient-to-tr from-indigo-500/10 to-purple-500/10 blur-md opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                    {item.icon}
+                  </div>
+                  <div className="text-indigo-400 font-mono font-bold text-sm mb-4 tracking-widest uppercase bg-indigo-500/10 px-3 py-1 rounded-full">{item.step}</div>
+                  <h3 className="text-2xl font-bold text-white mb-4">{item.title}</h3>
+                  <p className="text-zinc-400 leading-relaxed max-w-sm">
+                    {item.desc}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
 
         {/* Features Section */}
         <section id="features" className="py-32 relative">
@@ -337,9 +391,6 @@ function App() {
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row items-center justify-between gap-8 mb-12">
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-zinc-800 rounded-lg">
-                <Palette className="h-5 w-5 text-indigo-400" />
-              </div>
               <span className="text-xl font-bold text-white">syncDraw</span>
             </div>
             
@@ -356,7 +407,7 @@ function App() {
             </p>
             <div className="flex items-center gap-4">
               <span>Built with passion.</span>
-              <a href="https://github.com" className="hover:text-white transition-colors">
+              <a href="https://github.com/CyberKaps/syncDraw/tree/prod" className="hover:text-white transition-colors">
                 <Github className="h-5 w-5" />
               </a>
             </div>
