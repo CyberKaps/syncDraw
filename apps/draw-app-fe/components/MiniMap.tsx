@@ -35,7 +35,7 @@ export function MiniMap({
 
         // Clear
         ctx.clearRect(0, 0, miniMapSize, miniMapSize);
-        ctx.fillStyle = "rgba(30, 30, 30, 0.8)";
+        ctx.fillStyle = "rgba(3, 3, 3, 0.8)";
         ctx.fillRect(0, 0, miniMapSize, miniMapSize);
 
         // Draw all shapes (simplified)
@@ -58,7 +58,7 @@ export function MiniMap({
         const viewportWidth = (canvasWidth / zoom) * scale;
         const viewportHeight = (canvasHeight / zoom) * scale;
 
-        ctx.strokeStyle = "rgba(59, 130, 246, 0.8)"; // Blue
+        ctx.strokeStyle = "rgba(99, 102, 241, 0.8)"; // Indigo
         ctx.lineWidth = 2;
         ctx.strokeRect(viewportX, viewportY, viewportWidth, viewportHeight);
 
@@ -81,17 +81,17 @@ export function MiniMap({
     };
 
     return (
-        <div className="fixed bottom-6 left-6 z-50">
-            <div className="relative">
+        <div className="fixed bottom-6 left-6 z-50 pointer-events-none animate-fade-in-up animation-delay-300">
+            <div className="relative pointer-events-auto group">
                 {/* Title */}
-                <div className="absolute -top-8 left-0 right-0 text-center">
-                    <div className="bg-gradient-to-br from-gray-900/90 to-gray-800/90 backdrop-blur-sm text-white text-xs px-3 py-1 rounded-t-xl shadow-lg border border-gray-700/50 border-b-0 inline-block">
-                        <span className="font-medium">Overview</span>
+                <div className="absolute -top-8 left-0 right-0 text-center transition-transform group-hover:-translate-y-1">
+                    <div className="bg-zinc-900/80 backdrop-blur-xl text-zinc-300 text-xs px-4 py-1.5 rounded-t-xl shadow-lg border border-white/10 border-b-0 inline-block font-medium tracking-wide">
+                        Overview
                     </div>
                 </div>
                 
                 {/* MiniMap Canvas */}
-                <div className="bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 backdrop-blur-sm rounded-2xl shadow-2xl border-2 border-gray-700/50 overflow-hidden hover:border-blue-500/50 transition-all duration-200">
+                <div className="bg-zinc-900/70 backdrop-blur-xl rounded-2xl shadow-2xl border border-white/10 overflow-hidden hover:border-indigo-500/50 transition-all duration-300 hover:shadow-[0_0_20px_-5px_rgba(99,102,241,0.3)]">
                     <canvas
                         ref={miniMapRef}
                         width={miniMapSize}

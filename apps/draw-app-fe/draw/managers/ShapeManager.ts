@@ -46,7 +46,14 @@ export class ShapeManager {
       const maxY = Math.max(...ys);
       return { x: minX, y: minY, width: maxX - minX, height: maxY - minY };
     } else if (shape.type === "text") {
-      return { x: shape.x, y: shape.y - 16, width: 100, height: 20 };
+      const fontSize = (shape as any).fontSize || 24;
+      const estimatedWidth = Math.max(10, shape.content.length * (fontSize * 0.6));
+      return { 
+        x: shape.x, 
+        y: shape.y, 
+        width: estimatedWidth, 
+        height: fontSize
+      };
     }
     return { x: 0, y: 0, width: 0, height: 0 };
   }

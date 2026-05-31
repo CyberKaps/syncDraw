@@ -52,14 +52,22 @@ export class ShapeTransformer {
       let { x: bx, y: by, width: bw, height: bh } = bb;
 
       switch (handleIndex) {
-        case 0: bw = bw + (bx - x); bh = bh + (by - y); bx = x; by = y; break;
-        case 1: bw = x - bx; bh = bh + (by - y); by = y; break;
-        case 2: bw = x - bx; bh = y - by; break;
-        case 3: bw = bw + (bx - x); bh = y - by; bx = x; break;
-        case 4: bh = bh + (by - y); by = y; break;
-        case 5: bw = x - bx; break;
-        case 6: bh = y - by; break;
-        case 7: bw = bw + (bx - x); bx = x; break;
+        case 0: // Top-Left
+          bw = bw + (bx - x); bh = bh + (by - y); bx = x; by = y; break;
+        case 1: // Top-Center
+          bh = bh + (by - y); by = y; break;
+        case 2: // Top-Right
+          bw = x - bx; bh = bh + (by - y); by = y; break;
+        case 3: // Right-Center
+          bw = x - bx; break;
+        case 4: // Bottom-Right
+          bw = x - bx; bh = y - by; break;
+        case 5: // Bottom-Center
+          bh = y - by; break;
+        case 6: // Bottom-Left
+          bw = bw + (bx - x); bx = x; bh = y - by; break;
+        case 7: // Left-Center
+          bw = bw + (bx - x); bx = x; break;
       }
       bw = Math.max(6, bw);
       bh = Math.max(6, bh);

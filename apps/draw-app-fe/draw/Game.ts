@@ -380,16 +380,38 @@ export class Game {
   // ==================== Helper Methods ====================
 
   private handleTextToolClick(x: number, y: number) {
+    if (this.activeTextInput) {
+      // Just finish the current one if it exists
+      const text = this.activeTextInput.value.trim();
+      if (text) {
+        this.activeTextInput.dispatchEvent(new KeyboardEvent('keydown', {'key': 'Enter'}));
+      } else {
+        document.body.removeChild(this.activeTextInput);
+        this.activeTextInput = null;
+      }
+    }
+
     const input = document.createElement("input");
     input.type = "text";
     input.style.position = "absolute";
     const screenPos = this.zoomPanManager.canvasToScreen(x, y);
     input.style.left = screenPos.x + "px";
     input.style.top = screenPos.y + "px";
-    input.style.fontSize = "16px";
-    input.style.border = "1px solid blue";
-    input.style.background = "white";
+    
+    // Transparent styling so it looks like typing on canvas
+    const currentZoom = this.zoomPanManager.getZoom();
+    input.style.fontSize = `${24 * currentZoom}px`;
+    input.style.fontFamily = "sans-serif";
+    input.style.color = "white";
+    input.style.background = "transparent";
+    input.style.border = "none";
+    input.style.outline = "none";
+    input.style.padding = "0";
+    input.style.margin = "0";
+    input.style.minWidth = "200px";
     input.style.zIndex = "1000";
+    input.placeholder = "Type text...";
+    
     document.body.appendChild(input);
     input.focus();
     this.activeTextInput = input;
@@ -404,6 +426,7 @@ export class Game {
             x,
             y,
             content: text,
+            fontSize: 24,
           } as any;
           this.existingShapes.push(shape);
           this.wsHandler.sendShapeUpdate(shape, "chat");
@@ -420,9 +443,22 @@ export class Game {
 
           this.clearCanvas();
         }
-        document.body.removeChild(input);
+        if (input.parentNode) {
+          document.body.removeChild(input);
+        }
         this.activeTextInput = null;
       } else if (ev.key === "Escape") {
+        if (input.parentNode) {
+          document.body.removeChild(input);
+        }
+        this.activeTextInput = null;
+      }
+    });
+
+    // Also close on blur if empty
+    input.addEventListener("blur", () => {
+      const text = input.value.trim();
+      if (!text && input.parentNode) {
         document.body.removeChild(input);
         this.activeTextInput = null;
       }
@@ -547,7 +583,21 @@ export class Game {
     this.canvas.addEventListener("mousedown", this.mouseDownHandler);
     this.canvas.addEventListener("mouseup", this.mouseUpHandler);
     this.canvas.addEventListener("mousemove", this.mouseMoveHandler);
+    this.canvas.addEventListener("dblclick", this.doubleClickHandler);
   }
+
+  private doubleClickHandler = (e: MouseEvent) => {
+    // If we're not using the text tool, switch to it and handle click
+    if (this.selectedTool !== "text") {
+      this.selectedTool = "text";
+      if (this.onToolChange) {
+        this.onToolChange("text");
+      }
+    }
+    
+    const canvasPos = this.zoomPanManager.screenToCanvas(e.clientX, e.clientY);
+    this.handleTextToolClick(canvasPos.x, canvasPos.y);
+  };
 
   private wheelHandler = (e: WheelEvent) => {
     e.preventDefault();

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Circle, Pencil, RectangleHorizontalIcon, ArrowUpRight, Diamond, Minus, Type, MousePointer2, Home, Eraser, ZoomIn, ZoomOut, Maximize2, Trash2 } from "lucide-react";
+import { Circle, Pencil, RectangleHorizontalIcon, ArrowUpRight, Diamond, Minus, Type, MousePointer2, Home, Eraser, ZoomIn, ZoomOut, Maximize2, Trash2, Palette } from "lucide-react";
 import { Game } from "@/draw/Game";
 import { useRouter } from "next/navigation";
 import { MiniMap } from "./MiniMap";
@@ -98,11 +98,22 @@ export function Canvas({
         }
     };
 
-    return <div style={{
+    return <div className="bg-[#030303] selection:bg-indigo-500/30 font-sans" style={{
         height: "100vh",
-        overflow: "hidden"
+        overflow: "hidden",
+        position: "relative"
     }}>
-        <canvas ref={canvasRef} width={window.innerWidth} height={window.innerHeight}></canvas>
+        {/* Subtle ambient lighting */}
+        <div className="fixed inset-0 z-0 flex items-center justify-center overflow-hidden pointer-events-none opacity-50">
+            <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-indigo-600/10 blur-[120px] mix-blend-screen" />
+            <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full bg-purple-600/10 blur-[120px] mix-blend-screen" />
+        </div>
+
+        {/* Grid Background applied underneath canvas, assuming canvas handles its own rendering and is transparent, 
+            if canvas isn't transparent, it will cover this. */}
+        <div className="absolute inset-0 opacity-10 bg-[linear-gradient(to_right,#4f4f4f2e_1px,transparent_1px),linear-gradient(to_bottom,#4f4f4f2e_1px,transparent_1px)] bg-[size:24px_24px] pointer-events-none"></div>
+
+        <canvas ref={canvasRef} width={window.innerWidth} height={window.innerHeight} className="relative z-10"></canvas>
         <Topbar 
             setSelectedTool={setSelectedTool} 
             selectedTool={selectedTool} 
@@ -115,15 +126,17 @@ export function Canvas({
             onZoomOut={handleZoomOut} 
             onReset={handleResetZoom}
         />
-        <MiniMap 
-            shapes={shapes}
-            canvasWidth={window.innerWidth}
-            canvasHeight={window.innerHeight}
-            zoom={zoom}
-            panX={panX}
-            panY={panY}
-            onNavigate={handleMiniMapNavigate}
-        />
+        <div className="relative z-50">
+            <MiniMap 
+                shapes={shapes}
+                canvasWidth={window.innerWidth}
+                canvasHeight={window.innerHeight}
+                zoom={zoom}
+                panX={panX}
+                panY={panY}
+                onNavigate={handleMiniMapNavigate}
+            />
+        </div>
     </div>
 }
 
@@ -150,12 +163,22 @@ function Topbar({selectedTool, setSelectedTool, onGoHome, onClearAll}: {
     const shapeTools = tools.filter(t => t.group === "shapes");
 
     return (
-        <div className="fixed top-0 left-0 right-0 z-50 pointer-events-none">
-            <div className="flex justify-between items-start p-4 pointer-events-auto">
-                {/* Left side - Drawing tools */}
-                <div className="flex flex-col gap-3">
+        <div className="fixed top-0 left-0 right-0 z-50 pointer-events-none animate-fade-in-up">
+            <div className="flex justify-between items-start p-6 pointer-events-auto">
+                {/* Logo / Brand */}
+                <div className="hidden md:flex items-center gap-3 bg-zinc-900/60 backdrop-blur-xl border border-white/10 px-4 py-3 rounded-2xl shadow-2xl">
+                    <div className="p-1.5 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-lg shadow-lg shadow-indigo-500/20">
+                        <Palette className="h-5 w-5 text-white" />
+                    </div>
+                    <span className="text-xl font-bold bg-gradient-to-r from-white to-zinc-400 bg-clip-text text-transparent tracking-tight">
+                        syncDraw
+                    </span>
+                </div>
+
+                {/* Left side - Drawing tools (Centered practically) */}
+                <div className="flex flex-col gap-3 mx-auto">
                     {/* Main toolbar */}
-                    <div className="bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 backdrop-blur-sm rounded-2xl shadow-2xl border border-gray-700/50 p-3">
+                    <div className="bg-zinc-900/70 backdrop-blur-xl rounded-2xl shadow-2xl border border-white/10 p-2 transform transition-all duration-300 hover:shadow-indigo-500/10">
                         <div className="flex items-center gap-2">
                             {/* Basic Tools */}
                             <div className="flex gap-1">
@@ -170,7 +193,7 @@ function Topbar({selectedTool, setSelectedTool, onGoHome, onClearAll}: {
                                 ))}
                             </div>
 
-                            <div className="w-px h-8 bg-gray-700"></div>
+                            <div className="w-px h-8 bg-white/10"></div>
 
                             {/* Draw Tools */}
                             <div className="flex gap-1">
@@ -185,7 +208,7 @@ function Topbar({selectedTool, setSelectedTool, onGoHome, onClearAll}: {
                                 ))}
                             </div>
 
-                            <div className="w-px h-8 bg-gray-700"></div>
+                            <div className="w-px h-8 bg-white/10"></div>
 
                             {/* Shape Tools */}
                             <div className="flex gap-1">
@@ -201,35 +224,25 @@ function Topbar({selectedTool, setSelectedTool, onGoHome, onClearAll}: {
                             </div>
                         </div>
                     </div>
-
-                    {/* Active tool indicator */}
-                    {/* <div className="bg-gray-900/90 backdrop-blur-sm rounded-xl px-4 py-2 shadow-lg border border-gray-700/50">
-                        <div className="flex items-center gap-2">
-                            <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
-                            <span className="text-white text-sm font-medium">
-                                {tools.find(t => t.id === selectedTool)?.label || "Select Tool"}
-                            </span>
-                        </div>
-                    </div> */}
                 </div>
 
                 {/* Right side - Action buttons */}
                 <div className="flex gap-3">
                     <button
                         onClick={onClearAll}
-                        className="bg-gradient-to-br from-orange-600 to-orange-700 text-white px-5 py-3 rounded-xl hover:from-orange-500 hover:to-orange-600 transition-all duration-200 flex items-center gap-2 shadow-xl border border-orange-500/30 hover:shadow-orange-500/20 hover:scale-105"
+                        className="bg-zinc-900/60 text-white px-5 py-3 rounded-2xl hover:bg-zinc-800 transition-all duration-300 flex items-center gap-2 shadow-xl border border-white/10 hover:border-orange-500/50 hover:text-orange-400 hover:shadow-[0_0_20px_-5px_rgba(249,115,22,0.4)] hover:scale-105 backdrop-blur-xl"
                         title="Clear all drawings"
                     >
                         <Trash2 className="h-5 w-5" />
-                        <span className="hidden sm:inline font-medium">Clear All</span>
+                        <span className="hidden sm:inline font-semibold">Clear</span>
                     </button>
                     
                     <button
                         onClick={onGoHome}
-                        className="bg-gradient-to-br from-red-600 to-red-700 text-white px-5 py-3 rounded-xl hover:from-red-500 hover:to-red-600 transition-all duration-200 flex items-center gap-2 shadow-xl border border-red-500/30 hover:shadow-red-500/20 hover:scale-105"
+                        className="bg-white/10 text-white px-5 py-3 rounded-2xl hover:bg-red-600 transition-all duration-300 flex items-center gap-2 shadow-xl border border-white/10 hover:border-red-500/50 hover:shadow-[0_0_20px_-5px_rgba(220,38,38,0.5)] hover:scale-105 backdrop-blur-xl font-semibold"
                     >
                         <Home className="h-5 w-5" />
-                        <span className="hidden sm:inline font-medium">Exit Room</span>
+                        <span className="hidden sm:inline">Exit</span>
                     </button>
                 </div>
             </div>
@@ -247,10 +260,10 @@ function ToolButton({ icon, label, isActive, onClick }: {
         <button
             onClick={onClick}
             className={`
-                group relative p-3 rounded-xl transition-all duration-200
+                group relative p-3 rounded-xl transition-all duration-300
                 ${isActive 
-                    ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/30 scale-105' 
-                    : 'bg-gray-800/50 text-gray-300 hover:bg-gray-700 hover:text-white hover:scale-105'
+                    ? 'bg-indigo-600/20 text-indigo-400 shadow-[0_0_15px_-3px_rgba(79,70,229,0.4)] border border-indigo-500/50 scale-105' 
+                    : 'bg-transparent text-zinc-400 hover:bg-white/5 hover:text-white hover:scale-105 border border-transparent'
                 }
             `}
             title={label}
@@ -260,8 +273,8 @@ function ToolButton({ icon, label, isActive, onClick }: {
             </div>
             
             {/* Tooltip */}
-            <div className="absolute -bottom-10 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none">
-                <div className="bg-gray-900 text-white text-xs px-2 py-1 rounded shadow-lg whitespace-nowrap border border-gray-700">
+            <div className="absolute -bottom-12 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
+                <div className="bg-zinc-900 text-white text-xs px-3 py-1.5 rounded-lg shadow-xl whitespace-nowrap border border-white/10 font-medium">
                     {label}
                 </div>
             </div>
@@ -281,13 +294,13 @@ function ZoomControls({
     onReset: () => void;
 }) {
     return (
-        <div className="fixed bottom-6 right-6 z-50 flex flex-col gap-3">
+        <div className="fixed bottom-6 right-6 z-50 flex flex-col gap-3 pointer-events-none animate-fade-in-up animation-delay-200">
             {/* Zoom controls */}
-            <div className="bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 backdrop-blur-sm rounded-2xl shadow-2xl border border-gray-700/50 p-2">
-                <div className="flex flex-col gap-2">
+            <div className="bg-zinc-900/70 backdrop-blur-xl rounded-2xl shadow-2xl border border-white/10 p-2 pointer-events-auto">
+                <div className="flex flex-col gap-1">
                     <button
                         onClick={onZoomIn}
-                        className="bg-gray-800/50 text-white p-3 rounded-xl hover:bg-blue-600 hover:shadow-lg hover:shadow-blue-500/30 transition-all duration-200 hover:scale-105 group"
+                        className="text-zinc-400 p-3 rounded-xl hover:bg-white/5 hover:text-white transition-all duration-200 hover:scale-105"
                         title="Zoom In (Scroll Up)"
                     >
                         <ZoomIn className="h-5 w-5" />
@@ -295,7 +308,7 @@ function ZoomControls({
                     
                     <button
                         onClick={onReset}
-                        className="bg-gray-800/50 text-white px-3 py-2 rounded-xl hover:bg-blue-600 hover:shadow-lg hover:shadow-blue-500/30 transition-all duration-200 text-sm font-mono font-bold hover:scale-105"
+                        className="text-indigo-400 px-3 py-2 rounded-xl hover:bg-indigo-500/10 transition-all duration-200 text-xs font-mono font-bold hover:scale-105 border border-transparent hover:border-indigo-500/30"
                         title="Reset Zoom (Ctrl+0)"
                     >
                         {Math.round(zoom * 100)}%
@@ -303,17 +316,17 @@ function ZoomControls({
                     
                     <button
                         onClick={onZoomOut}
-                        className="bg-gray-800/50 text-white p-3 rounded-xl hover:bg-blue-600 hover:shadow-lg hover:shadow-blue-500/30 transition-all duration-200 hover:scale-105 group"
+                        className="text-zinc-400 p-3 rounded-xl hover:bg-white/5 hover:text-white transition-all duration-200 hover:scale-105"
                         title="Zoom Out (Scroll Down)"
                     >
                         <ZoomOut className="h-5 w-5" />
                     </button>
                     
-                    <div className="border-t border-gray-700 my-1"></div>
+                    <div className="border-t border-white/10 my-1 mx-2"></div>
                     
                     <button
                         onClick={onReset}
-                        className="bg-gray-800/50 text-white p-3 rounded-xl hover:bg-blue-600 hover:shadow-lg hover:shadow-blue-500/30 transition-all duration-200 hover:scale-105 group"
+                        className="text-zinc-400 p-3 rounded-xl hover:bg-white/5 hover:text-white transition-all duration-200 hover:scale-105"
                         title="Fit to Screen"
                     >
                         <Maximize2 className="h-5 w-5" />
@@ -322,10 +335,10 @@ function ZoomControls({
             </div>
             
             {/* Pan hint */}
-            <div className="bg-gradient-to-br from-gray-900/90 to-gray-800/90 backdrop-blur-sm text-white text-xs px-3 py-2 rounded-xl shadow-lg border border-gray-700/50">
+            <div className="bg-zinc-900/80 backdrop-blur-xl text-zinc-300 text-xs px-3 py-2.5 rounded-xl shadow-lg border border-white/10 pointer-events-auto transition-transform hover:scale-105">
                 <div className="text-center font-medium">
                     <div className="flex items-center gap-2">
-                        <kbd className="px-2 py-0.5 bg-gray-700 rounded text-[10px]">Shift</kbd>
+                        <kbd className="px-2 py-1 bg-white/10 rounded-md text-[10px] font-mono border border-white/5 shadow-inner">Shift</kbd>
                         <span>+ Drag to Pan</span>
                     </div>
                 </div>
@@ -333,3 +346,4 @@ function ZoomControls({
         </div>
     );
 }
+
