@@ -29,8 +29,12 @@ syncDraw is a feature-rich real-time collaborative whiteboard application that e
 
 ### 🔐 Authentication & User Management
 - **Secure Authentication** - JWT-based sign up and sign in system
+- **Anonymous Guest Mode** - Users can instantly join via a share link without needing an account
 - **User Dashboard** - View and manage your created rooms
 - **Protected Routes** - Secure access to drawing rooms
+
+### 🤖 AI Generation
+- **AI Architecture Diagrams** - Use the "Generate Diagram" tool to automatically build system architectures and flowcharts on the canvas using natural language prompts via the Gemini API.
 
 ### 🚪 Room Management
 - **Create Rooms** - Generate unique room slugs for collaboration sessions
@@ -86,6 +90,8 @@ syncDraw is a feature-rich real-time collaborative whiteboard application that e
 - ✅ Create rooms with unique slugs
 - ✅ Optional password protection (toggle checkbox)
 - ✅ Join rooms with password verification
+- ✅ **Share Link** - Copy room URL for instant sharing
+- ✅ **Anonymous Guest Mode** - Guests can join without creating an account
 - ✅ View all created rooms on dashboard
 - ✅ Delete rooms (admin authorization)
 - ✅ Room metadata (creation date, admin info)
@@ -98,6 +104,7 @@ syncDraw is a feature-rich real-time collaborative whiteboard application that e
 - ✅ Shape selection and manipulation
 - ✅ Drag to move shapes
 - ✅ Resize handles for shape adjustment
+- ✅ **AI Diagram Generation** - Generate flowcharts and diagrams using Gemini AI
 - ✅ Shape deletion with eraser
 - ✅ Clear all drawings (erase entire canvas)
 - ✅ Text input with customizable size

@@ -211,6 +211,22 @@ const screenY = canvasY * zoom + panY
 4. Auto-switches to Select tool for repositioning
 5. Press Escape to cancel
 
+#### **5. AI Diagram Generation**
+
+**Natural Language to Canvas Flow:**
+1. User opens the "Generate Diagram" modal and inputs a prompt (e.g., "AWS Architecture for Web App").
+2. The frontend sends the prompt to the HTTP backend (`/generate-diagram`).
+3. The backend securely uses the **Gemini API** with a strict JSON schema for structured drawing output (rectangles, circles, arrows, text).
+4. The AI returns an array of coordinates and shapes mapped to the `syncDraw` data structure.
+5. The backend returns these shapes, and the frontend broadcasts them to the room via WebSocket so all users see the diagram instantly appear.
+
+#### **6. Anonymous Guest Mode & Instant Sharing**
+
+**Frictionless Collaboration:**
+- **Share Link**: A Share button copies the room link (e.g., `/canvas/room-slug`).
+- **No Sign-In Required**: When a user accesses the URL without a JWT token, they bypass the auth wall and establish a WebSocket connection with `userId: null`.
+- **Schema Adaptation**: Database `Chat` schema handles `userId` as optional (`String?`) to track anonymous strokes gracefully without crashing.
+
 ---
 
 ## 🔄 Real-Time Synchronization
@@ -737,6 +753,8 @@ Client A  ←→  WebSocket Server  ←→  Client B
 - **Mini-Map**: Bird's eye view with viewport indicator
 - **Eraser**: Click or drag mode
 - **Auto-Select**: Newly created shapes auto-selected
+- **AI Diagrams**: Generate architecture from text via Gemini API
+- **Instant Sharing**: Anonymous guest mode via URL links
 
 ---
 
