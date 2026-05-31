@@ -35,6 +35,7 @@ jobs:
           build-args: |
             DATABASE_URL=${{ secrets.DATABASE_URL }}
             JWT_SECRET=${{ secrets.JWT_SECRET }}
+            GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }}
 
       - name: Deploy to VM via SSH
         run: |
@@ -72,6 +73,7 @@ jobs:
               -p 3001:3001 \
               -e DATABASE_URL="postgresql://postgres:mysecretpassword@postgres-db:5432/syncdraw?schema=public" \
               -e JWT_SECRET="${{ secrets.JWT_SECRET }}" \
+              -e GEMINI_API_KEY="${{ secrets.GEMINI_API_KEY }}" \
               -e NODE_ENV=production \
               --restart unless-stopped \
               cyberkaps/sync-backend:latest
